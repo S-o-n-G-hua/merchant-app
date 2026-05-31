@@ -206,17 +206,23 @@
 
 <script>
 let authMode = 'login';
-let authToken = localStorage.getItem('auth_token');
-const API = 'https://partner-rob-values-location.trycloudflare.com';
 
-// Check login status on page load
-if (authToken) {
-    fetch(API + '/api/me', {
-        headers: { 'Authorization': 'Bearer ' + authToken }
-    }).then(r => r.json()).then(data => {
-        if (data.success) showLoggedIn(data.user);
-    }).catch(() => { localStorage.removeItem('auth_token'); });
+// 纯前端认证 - 使用localStorage存储用户数据
+var STORAGE_KEY_USERS = 'merchant_app_users';
+var STORAGE_KEY_CURRENT = 'merchant_app_current_user';
+
+function getStoredUsers() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY_USERS) || '[]'); }
+    catch(e) { return []; }
 }
+function saveStoredUsers(users) { localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users)); }
+
+(function checkLoginStatus() {
+    try {
+        var u = JSON.parse(localStorage.getItem(STORAGE_KEY_CURRENT) || 'null');
+        if (u && u.username) showLoggedIn(u);
+    } catch(e) {}
+})();
 
 function toggleAuthMode() {
     authMode = authMode === 'login' ? 'register' : 'login';
@@ -227,37 +233,29 @@ function toggleAuthMode() {
 }
 
 function submitAuth() {
-    const username = document.getElementById('auth-username').value.trim();
-    const password = document.getElementById('auth-password').value;
-    const phone = document.getElementById('auth-phone').value.trim();
-    const errorEl = document.getElementById('auth-error');
+    var username = document.getElementById('auth-username').value.trim();
+    var password = document.getElementById('auth-password').value;
+    var phone = document.getElementById('auth-phone').value.trim();
+    var errorEl = document.getElementById('auth-error');
+    if (!username || !password) { errorEl.textContent = '用户名和密码必填'; errorEl.style.display = 'block'; return; }
+    if (username.length < 2 || username.length > 20) { errorEl.textContent = '用户名长度2-20个字符'; errorEl.style.display = 'block'; return; }
+    if (password.length < 4) { errorEl.textContent = '密码至少4位'; errorEl.style.display = 'block'; return; }
 
-    if (!username || !password) {
-        errorEl.textContent = '用户名和密码必填';
-        errorEl.style.display = 'block';
-        return;
+    var users = getStoredUsers();
+    if (authMode === 'register') {
+        var exists = users.find(function(u){ return u.username === username; });
+        if (exists) { errorEl.textContent = '该用户名已被注册'; errorEl.style.display = 'block'; return; }
+        var newUser = { username: username, password: password, phone: phone || '', createdAt: new Date().toISOString() };
+        users.push(newUser);
+        saveStoredUsers(users);
+        localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(newUser));
+        showLoggedIn(newUser);
+    } else {
+        var user = users.find(function(u){ return u.username === username && u.password === password; });
+        if (!user) { errorEl.textContent = '用户名或密码错误'; errorEl.style.display = 'block'; return; }
+        localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(user));
+        showLoggedIn(user);
     }
-
-    const url = authMode === 'login' ? '/api/login' : '/api/register';
-    const body = authMode === 'login' ? { username, password } : { username, password, phone };
-
-    fetch(API + url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-    }).then(r => r.json()).then(data => {
-        if (!data.success) {
-            errorEl.textContent = data.error;
-            errorEl.style.display = 'block';
-            return;
-        }
-        authToken = data.token;
-        localStorage.setItem('auth_token', authToken);
-        showLoggedIn(data.user);
-    }).catch(err => {
-        errorEl.textContent = '网络错误，请重试';
-        errorEl.style.display = 'block';
-    });
 }
 
 function showLoggedIn(user) {
@@ -267,33 +265,8 @@ function showLoggedIn(user) {
     document.getElementById('mine-phone').textContent = user.phone || '';
 }
 
-
-function showSubPage(name) {
-    // 隐藏所有子页面
-    document.querySelectorAll('.sub-page').forEach(function(p){ p.style.display = 'none' });
-    // 隐藏主内容
-    document.getElementById('mine-logged-in').style.display = 'none';
-    // 显示目标子页面
-    var subPage = document.getElementById('sub-' + name);
-    if (subPage) {
-        subPage.style.display = 'block';
-        // 设置页填充用户名
-        if (name === 'setting') {
-            var uname = document.getElementById('mine-username').textContent;
-            document.getElementById('setting-username').textContent = uname;
-        }
-    }
-}
-
-function hideSubPage() {
-    // 隐藏所有子页面
-    document.querySelectorAll('.sub-page').forEach(function(p){ p.style.display = 'none' });
-    // 显示主内容
-    document.getElementById('mine-logged-in').style.display = 'block';
-}
 function logout() {
-    localStorage.removeItem('auth_token');
-    authToken = null;
+    localStorage.removeItem(STORAGE_KEY_CURRENT);
     document.getElementById('mine-logged-in').style.display = 'none';
     document.getElementById('mine-logged-out').style.display = 'block';
     document.getElementById('auth-username').value = '';
