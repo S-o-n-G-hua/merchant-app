@@ -29,6 +29,46 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 .user-balance{font-size:18px;font-weight:700;color:#667eea}
 .empty{text-align:center;color:#999;padding:30px 0;font-size:14px}
 .token-hint{font-size:11px;color:#999;margin-top:8px}
+
+/* Token 输入区域 */
+.token-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.token-section h3 {
+  font-size: 15px;
+  margin-bottom: 12px;
+  color: #333;
+}
+.token-section input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 13px;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+}
+.token-btn {
+  width: 100%;
+  padding: 10px;
+  background: #1989fa;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.token-btn:active { opacity: 0.7; }
+.token-status {
+  text-align: center;
+  font-size: 12px;
+  margin-top: 8px;
+  color: #999;
+}
 </style>
 </head>
 <body>
@@ -80,6 +120,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;b
 </div>
 
 <script>
+
+  function connectWithToken() {
+    const token = document.getElementById('token-input').value.trim();
+    if (!token) {
+      document.getElementById('token-status').textContent = '请输入 Token';
+      document.getElementById('token-status').style.color = '#e74c3c';
+      return;
+    }
+    GITHUB_TOKEN = token;
+    document.getElementById('token-status').textContent = '连接中...';
+    document.getElementById('token-status').style.color = '#666';
+    // 验证 token 是否有效
+    fetch('https://api.github.com/user', {
+      headers: { 'Authorization': 'token ' + token, 'User-Agent': 'node' }
+    }).then(function(r) {
+      if (r.ok) {
+        document.getElementById('token-section').style.display = 'none';
+        document.getElementById('main-container').style.display = 'block';
+        loadUserList();
+      } else {
+        document.getElementById('token-status').textContent = 'Token 无效，请重新输入';
+        document.getElementById('token-status').style.color = '#e74c3c';
+      }
+    }).catch(function() {
+      document.getElementById('token-status').textContent = '网络错误，请重试';
+      document.getElementById('token-status').style.color = '#e74c3c';
+    });
+  }
+  
 var TOKEN = '';
 var REPO = 'S-o-n-G-hua/merchant-app';
 var BRANCH = 'main';
