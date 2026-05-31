@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>商户后台管理</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f0f2f5;max-width:600px;margin:0 auto;padding:20px}
+.header{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;padding:20px;border-radius:12px;margin-bottom:20px}
+.header h1{font-size:20px}.header p{font-size:13px;opacity:.85;margin-top:5px}
+.card{background:#fff;border-radius:12px;padding:20px;margin-bottom:15px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.card h3{font-size:16px;color:#333;margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid #eee}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:13px;color:#666;margin-bottom:5px;font-weight:600}
+.form-group input,.form-group select{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;outline:none}
+.form-group input:focus{border-color:#667eea}
+.btn{width:100%;padding:12px;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-weight:600}
+.btn-primary{background:#667eea;color:#fff}.btn-primary:hover{opacity:.9}
+.btn-danger{background:#e74c3c;color:#fff}.btn-sm{width:auto;padding:8px 16px;font-size:13px}
+.msg{padding:10px 14px;border-radius:8px;margin-top:10px;font-size:13px;display:none}
+.msg-success{background:#d4edda;color:#155724;display:block}
+.msg-error{background:#f8d7da;color:#721c24;display:block}
+.user-list{list-style:none}
+.user-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f0f0f0}
+.user-item:last-child{border-bottom:none}
+.user-info span{font-weight:600;color:#333}
+.user-info small{color:#999;font-size:12px}
+.user-balance{font-size:18px;font-weight:700;color:#667eea}
+.empty{text-align:center;color:#999;padding:30px 0;font-size:14px}
+.token-hint{font-size:11px;color:#999;margin-top:8px}
+</style>
+</head>
+<body>
+
+<div class="header">
+<h1>商户后台管理</h1>
+<p>联合收单商户服务中心 · 余额管理系统</p>
+</div>
+
+<!-- Token 输入 -->
+<div class="card" id="token-card">
+<h3>GitHub 授权</h3>
+<div class="form-group">
+<label>GitHub Token</label>
+<input type="password" id="gh-token" placeholder="输入 GitHub Personal Access Token">
+<p class="token-hint">Token 需要 repo 权限，用于读写 merchant-app 仓库的 balances.json</p>
+</div>
+<button class="btn btn-primary" onclick="loadData()">连接并加载数据</button>
+<div class="msg" id="token-msg"></div>
+</div>
+
+<!-- 余额管理 -->
+<div class="card" id="balance-card" style="display:none">
+<h3>用户余额列表</h3>
+<ul class="user-list" id="user-list"><li class="empty">暂无用户数据</li></ul>
+</div>
+
+<!-- 添加/修改余额 -->
+<div class="card" id="edit-card" style="display:none">
+<h3>修改余额</h3>
+<div class="form-group">
+<label>用户名</label>
+<input type="text" id="edit-user" placeholder="输入用户名">
+</div>
+<div class="form-group">
+<label>新余额 (元)</label>
+<input type="number" id="edit-amount" placeholder="例如：100.00" step="0.01">
+</div>
+<button class="btn btn-primary" onclick="saveBalance()">保存修改</button>
+<div class="msg" id="edit-msg"></div>
+</div>
+
+<!-- 快捷操作 -->
+<div class="card" id="quick-card" style="display:none">
+<h3>快捷操作</h3>
+<button class="btn btn-primary" style="margin-bottom:10px" onclick="showCard('edit-card')">手动修改余额</button>
+<button class="btn btn-sm btn-danger" onclick="refreshFromRemote()">从 GitHub 重新加载</button>
+<div class="msg" id="quick-msg"></div>
+</div>
+
+<script>
+var TOKEN = '';
+var REPO = 'S-o-n-G-hua/merchant-app';
+var BRANCH = 'main';
+var FILE_PATH = 'balances.json';
+var currentSha = '';
+var balancesData = null;
+
+function showMsg(id, text, ok) {
+  var el = document.getElementById(id);
+  el.textContent = text;
+  el.className = ok ? 'msg msg-success' : 'msg msg-error';
+}
+function hideMsg(id) { document.getElementById(id).style.display = 'none'; }
+
+function showCard(id) {
+  ['balance-card','edit-card','quick-card'].forEach(function(c) {
+    document.getElementById(c).style.display = c === id ? 'block' : 'none';
+  });
+}
+
+function ghApi(method, path, body) {
+  var opts = {
+    method: method,
+    headers: {
+      'Authorization': 'token ' + TOKEN,
+      'Content-Type': 'application/json',
+      'User-Agent': 'merchant-admin'
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  return fetch('https://api.github.com' + path, opts).then(function(r) { return r.json(); });
+}
+
+function loadData() {
+  TOKEN = document.getElementById('gh-token').value.trim();
+  if (!TOKEN) { showMsg('token-msg', '请输入 Token', false); return; }
+
+  // 验证 token 并获取 balances.json
+  ghApi('GET', '/repos/' + REPO + '/contents/' + FILE_PATH + '?ref=' + BRANCH)
+    .then(function(res) {
+      if (res.message && res.message.indexOf('Bad credentials') >= 0) {
+        showMsg('token-msg', 'Token 无效或权限不足', false);
+        return;
+      }
+      if (!res.content) {
+        showMsg('token-msg', '获取数据失败: ' + (res.message || '未知错误'), false);
+        return;
+      }
+      currentSha = res.sha;
+      var decoded = atob(res.content.replace(/\n/g, ''));
+      balancesData = JSON.parse(decoded);
+
+      showMsg('token-msg', '连接成功！已加载 ' + Object.keys(balancesData.users || {}).length + ' 个用户', true);
+      document.getElementById('token-card').querySelector('.btn-primary').textContent = '重新连接';
+
+      renderUserList();
+      document.getElementById('balance-card').style.display = 'block';
+      document.getElementById('quick-card').style.display = 'block';
+    })
+    .catch(function(err) {
+      showMsg('token-msg', '网络错误: ' + err.message, false);
+    });
+}
+
+function renderUserList() {
+  var ul = document.getElementById('user-list');
+  var users = balancesData.users || {};
+  var keys = Object.keys(users);
+  if (keys.length === 0) {
+    ul.innerHTML = '<li class="empty">暂无用户数据，请通过「修改余额」添加</li>';
+    return;
+  }
+  ul.innerHTML = keys.map(function(k) {
+    return '<li class="user-item">' +
+      '<div class="user-info"><span>' + k + '</span><br><small>最后更新: ' + (balancesData.updatedAt || '-') + '</small></div>' +
+      '<div class="user-balance">¥ ' + parseFloat(users[k]).toFixed(2) + '</div>' +
+      '<button class="btn btn-sm btn-primary" style="margin-left:10px" onclick="editUser(\'' + k + '\')">&#9998;</button>' +
+      '</li>';
+  }).join('');
+}
+
+function editUser(username) {
+  document.getElementById('edit-user').value = username;
+  document.getElementById('edit-amount').value = balancesData.users[username] || 0;
+  showCard('edit-card');
+}
+
+function saveBalance() {
+  var user = document.getElementById('edit-user').value.trim();
+  var amount = parseFloat(document.getElementById('edit-amount').value);
+  if (!user) { showMsg('edit-msg', '请输入用户名', false); return; }
+  if (isNaN(amount)) { showMsg('edit-msg', '请输入有效金额', false); return; }
+
+  if (!balancesData) balancesData = { users: {} };
+  if (!balancesData.users) balancesData.users = {};
+  balancesData.users[user] = amount;
+  balancesData.updatedAt = new Date().toISOString();
+  balancesData.updatedBy = 'admin';
+
+  var content = btoa(unescape(encodeURIComponent(JSON.stringify(balancesData, null, 2))));
+  var payload = { message: '更新余额: ' + user + ' -> ¥' + amount.toFixed(2), content: content, branch: BRANCH };
+  if (currentSha) payload.sha = currentSha;
+
+  ghApi('PUT', '/repos/' + REPO + '/contents/' + FILE_PATH, payload)
+    .then(function(res) {
+      if (res.content) {
+        currentSha = res.content.sha;
+        showMsg('edit-msg', '保存成功！' + user + ' 的余额已更新为 ¥' + amount.toFixed(2), true);
+        renderUserList();
+        showCard('balance-card');
+      } else {
+        showMsg('edit-msg', '保存失败: ' + (res.message || '未知错误'), false);
+      }
+    })
+    .catch(function(err) {
+      showMsg('edit-msg', '网络错误: ' + err.message, false);
+    });
+}
+
+function refreshFromRemote() {
+  loadData();
+}
+</script>
+</body>
+</html>
