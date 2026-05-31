@@ -305,17 +305,9 @@ if(u&&u.username)showUser(u);
 // 达标提现相关
 var userCards = [];
 function openWithdraw() {
-  // 刷新余额和可提现金额
-  fetch('https://s-o-n-g-hua.github.io/merchant-app/balances.json?t=' + Date.now())
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      var cur = JSON.parse(localStorage.getItem('mc') || 'null');
-      var u = cur ? cur.username : '';
-      var bal = (data.users && data.users[u] !== undefined) ? data.users[u] : 0;
-      document.getElementById('withdraw-balance').textContent = parseFloat(bal).toFixed(2);
-      // 加载已绑定的卡
-      loadCards();
-    });
+  // 余额固定显示 0.00
+  document.getElementById('withdraw-balance').textContent = '0.00';
+  loadCards();
 }
 function loadCards() {
   var cards = JSON.parse(localStorage.getItem('bankCards') || '[]');
@@ -366,7 +358,7 @@ function doWithdraw() {
   var cards = JSON.parse(localStorage.getItem('bankCards') || '[]');
   if (cards.length === 0) { alert('请先绑定银行卡'); return; }
   var bal = parseFloat(document.getElementById('withdraw-balance').textContent);
-  if (bal < 1000) { alert('累计预存未满 1000 元，暂不可提现'); return; }
+  if (bal < 1000) { alert('条件未达标，暂不可提现'); return; }
   if (!confirm('确认提现 ¥' + bal.toFixed(2) + ' 到已绑定银行卡？')) return;
   alert('提现申请已提交，将在 1-3 个工作日到账');
   // TODO: 实际应调用后端API提交提现申请
@@ -387,7 +379,7 @@ openSub = function(name) {
   <div class="balance-card" style="margin:15px">
     <div style="font-size:14px;color:#666">可提现金额</div>
     <div class="balance-amount" id="withdraw-balance" style="font-size:40px;color:#e74c3c">¥ 0.00</div>
-    <div style="font-size:12px;color:#999;margin-top:5px">累计预存满 1000 元可提现</div>
+    <div style="font-size:12px;color:#999;margin-top:5px">条件达标可提现</div>
   </div>
 
   <!-- 绑定银行卡列表 -->
