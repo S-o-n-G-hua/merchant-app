@@ -379,5 +379,53 @@ openSub = function(name) {
 };
 
 </script>
+
+<!-- 子页面：达标提现 -->
+<div id="sub-withdraw" class="sub-page">
+<div class="sub-header"><button class="sub-back" onclick="closeSub()">←</button><span class="sub-title">达标提现</span></div>
+<div class="sub-body">
+  <div class="balance-card" style="margin:15px">
+    <div style="font-size:14px;color:#666">可提现金额</div>
+    <div class="balance-amount" id="withdraw-balance" style="font-size:40px;color:#e74c3c">¥ 0.00</div>
+    <div style="font-size:12px;color:#999;margin-top:5px">累计预存满 1000 元可提现</div>
+  </div>
+
+  <!-- 绑定银行卡列表 -->
+  <div style="margin:15px;background:#fff;border-radius:12px;padding:15px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <span style="font-size:15px;font-weight:600">绑定银行卡</span>
+      <button onclick="showBindCard()" style="background:none;border:none;color:#1989fa;font-size:14px">+ 绑卡</button>
+    </div>
+    <div id="card-list">
+      <div style="text-align:center;color:#999;padding:20px 0" id="no-card-tip">暂无绑定银行卡，请先绑卡</div>
+    </div>
+  </div>
+
+  <div style="padding:0 15px">
+    <button class="btn-primary" onclick="doWithdraw()" style="width:100%;margin-top:10px">申请提现</button>
+  </div>
+</div>
+</div>
+
+<!-- 绑卡弹窗 -->
+<div id="bind-card-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:999;justify-content:center;align-items:center">
+<div style="background:#fff;width:90%;max-width:360px;border-radius:16px;padding:24px">
+  <div style="font-size:18px;font-weight:700;text-align:center;margin-bottom:20px">绑定银行卡</div>
+  <div class="form-group" style="margin-bottom:12px">
+    <input type="text" id="card-name" placeholder="持卡人姓名" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">
+  </div>
+  <div class="form-group" style="margin-bottom:12px">
+    <input type="text" id="card-number" placeholder="银行卡号（16-19位数字）" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">
+  </div>
+  <div class="form-group" style="margin-bottom:20px">
+    <input type="text" id="card-bank" placeholder="开户银行（如：工商银行）" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box">
+  </div>
+  <div style="display:flex;gap:12px">
+    <button onclick="closeBindCard()" style="flex:1;padding:10px;border:1px solid #ddd;background:#fff;border-radius:8px;font-size:15px">取消</button>
+    <button onclick="saveCard()" style="flex:1;padding:10px;border:none;background:#1989fa;color:#fff;border-radius:8px;font-size:15px">确认绑定</button>
+  </div>
+</div>
+</div>
+
 </body>
 </html>
