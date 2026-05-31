@@ -1,5 +1,7 @@
 {
-  "users": {},
-  "updatedAt": "2026-05-31T15:03:31.901Z",
-  "updatedBy": "admin-clean"
+  "users": {
+    "劳宗政": 888
+  },
+  "updatedAt": "2026-05-31T15:19:25.180Z",
+  "updatedBy": "admin"
 }
