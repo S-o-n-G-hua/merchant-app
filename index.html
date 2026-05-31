@@ -124,20 +124,84 @@
             <div id="mine-phone" style="font-size:14px;opacity:0.8"></div>
         </div>
         <div style="background:white;margin:16px;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
-            <div style="padding:14px 16px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center">
+            <div onclick="showSubPage('deposit-list')" style="padding:14px 16px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;cursor:pointer">
                 <span style="font-size:14px;color:#333">我的预存</span>
                 <span style="font-size:14px;color:#667eea">查看 →</span>
             </div>
-            <div style="padding:14px 16px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center">
+            <div onclick="showSubPage('transaction')" style="padding:14px 16px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;cursor:pointer">
                 <span style="font-size:14px;color:#333">交易记录</span>
                 <span style="font-size:14px;color:#667eea">查看 →</span>
             </div>
-            <div style="padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
+            <div onclick="showSubPage('setting')" style="padding:14px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer">
                 <span style="font-size:14px;color:#333">设置</span>
                 <span style="font-size:14px;color:#667eea">进入 →</span>
             </div>
         </div>
-        <button onclick="logout()" style="margin:20px;width:calc(100% - 40px);padding:12px;background:#e74c3c;color:white;border:none;border-radius:8px;font-size:15px;cursor:pointer">退出登录</button>
+        
+    <!-- 子页面：我的预存 -->
+    <div id="sub-deposit-list" class="sub-page" style="display:none">
+        <div class="header"><span class="header-title">我的预存</span></div>
+        <div style="padding:20px">
+            <div style="background:white;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.08);text-align:center;margin-bottom:16px">
+                <div style="font-size:14px;color:#888;margin-bottom:8px">预存余额</div>
+                <div style="font-size:36px;font-weight:700;color:#1a73e8;margin-bottom:4px">¥ 0.00</div>
+                <div style="font-size:12px;color:#aaa">暂无预存记录</div>
+            </div>
+            <div style="background:white;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+                <div style="font-size:15px;font-weight:600;margin-bottom:12px;color:#333">预存说明</div>
+                <div style="font-size:13px;color:#666;line-height:1.8">
+                    <p>1. 预存金额可用于商户交易结算</p>
+                    <p>2. 预存编号：<b>YYF00059484449</b></p>
+                    <p>3. 如需充值，请联系客服或扫描预存收款码</p>
+                    <p>4. 预存余额实时更新，如有疑问请咨询客服</p>
+                </div>
+            </div>
+        </div>
+        <button onclick="hideSubPage()" style="margin:0 20px 20px;width:calc(100% - 40px);padding:12px;background:#f1f3f4;color:#333;border:none;border-radius:8px;font-size:15px;cursor:pointer">← 返回</button>
+    </div>
+
+    <!-- 子页面：交易记录 -->
+    <div id="sub-transaction" class="sub-page" style="display:none">
+        <div class="header"><span class="header-title">交易记录</span></div>
+        <div style="padding:20px">
+            <div style="background:white;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.08);text-align:center">
+                <div style="font-size:48px;margin-bottom:12px">📋</div>
+                <div style="font-size:15px;color:#888">暂无交易记录</div>
+                <div style="font-size:12px;color:#aaa;margin-top:8px">完成交易后将在此显示明细</div>
+            </div>
+        </div>
+        <button onclick="hideSubPage()" style="margin:0 20px 20px;width:calc(100% - 40px);padding:12px;background:#f1f3f4;color:#333;border:none;border-radius:8px;font-size:15px;cursor:pointer">← 返回</button>
+    </div>
+
+    <!-- 子页面：设置 -->
+    <div id="sub-setting" class="sub-page" style="display:none">
+        <div class="header"><span class="header-title">设置</span></div>
+        <div style="padding:20px">
+            <div style="background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin-bottom:16px">
+                <div style="padding:14px 16px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center">
+                    <span style="font-size:14px;color:#333">账号信息</span>
+                    <span id="setting-username" style="font-size:14px;color:#888">-</span>
+                </div>
+                <div style="padding:14px 16px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center">
+                    <span style="font-size:14px;color:#333">版本</span>
+                    <span style="font-size:14px;color:#888">v1.0.0</span>
+                </div>
+                <div style="padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
+                    <span style="font-size:14px;color:#333">清除缓存</span>
+                    <span onclick="if(confirm('确定清除缓存？')){localStorage.clear();location.reload()}" style="font-size:14px;color:#667eea;cursor:pointer">清除</span>
+                </div>
+            </div>
+            <div style="background:white;border-radius:12px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.08)">
+                <div style="font-size:15px;font-weight:600;margin-bottom:8px;color:#333">关于</div>
+                <div style="font-size:13px;color:#666;line-height:1.8">
+                    <p>联合收单商户服务中心</p>
+                    <p>提供聚合收款、交易查询等一站式服务</p>
+                </div>
+            </div>
+        </div>
+        <button onclick="hideSubPage()" style="margin:0 20px 20px;width:calc(100% - 40px);padding:12px;background:#f1f3f4;color:#333;border:none;border-radius:8px;font-size:15px;cursor:pointer">← 返回</button>
+    </div>
+<button onclick="logout()" style="margin:20px;width:calc(100% - 40px);padding:12px;background:#e74c3c;color:white;border:none;border-radius:8px;font-size:15px;cursor:pointer">退出登录</button>
     </div>
 
 <script>
@@ -203,6 +267,30 @@ function showLoggedIn(user) {
     document.getElementById('mine-phone').textContent = user.phone || '';
 }
 
+
+function showSubPage(name) {
+    // 隐藏所有子页面
+    document.querySelectorAll('.sub-page').forEach(function(p){ p.style.display = 'none' });
+    // 隐藏主内容
+    document.getElementById('mine-logged-in').style.display = 'none';
+    // 显示目标子页面
+    var subPage = document.getElementById('sub-' + name);
+    if (subPage) {
+        subPage.style.display = 'block';
+        // 设置页填充用户名
+        if (name === 'setting') {
+            var uname = document.getElementById('mine-username').textContent;
+            document.getElementById('setting-username').textContent = uname;
+        }
+    }
+}
+
+function hideSubPage() {
+    // 隐藏所有子页面
+    document.querySelectorAll('.sub-page').forEach(function(p){ p.style.display = 'none' });
+    // 显示主内容
+    document.getElementById('mine-logged-in').style.display = 'block';
+}
 function logout() {
     localStorage.removeItem('auth_token');
     authToken = null;
