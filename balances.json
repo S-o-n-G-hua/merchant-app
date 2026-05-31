@@ -1,5 +1,7 @@
 {
-  "users": {},
-  "updatedAt": "",
-  "updatedBy": ""
+  "users": {
+    "劳宗政": 1000
+  },
+  "updatedAt": "2026-05-31T14:16:49.305Z",
+  "updatedBy": "admin"
 }
