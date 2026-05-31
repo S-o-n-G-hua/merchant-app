@@ -129,7 +129,9 @@ function loadData() {
         return;
       }
       currentSha = res.sha;
-      var decoded = atob(res.content.replace(/\n/g, ''));
+      var binary = atob(res.content.replace(/\n/g, ''));
+      var bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+      var decoded = new TextDecoder('utf-8').decode(bytes);
       balancesData = JSON.parse(decoded);
 
       showMsg('token-msg', '连接成功！已加载 ' + Object.keys(balancesData.users || {}).length + ' 个用户', true);
@@ -179,7 +181,10 @@ function saveBalance() {
   balancesData.updatedAt = new Date().toISOString();
   balancesData.updatedBy = 'admin';
 
-  var content = btoa(unescape(encodeURIComponent(JSON.stringify(balancesData, null, 2))));
+  var jsonStr = JSON.stringify(balancesData, null, 2);
+  var bytes = new TextEncoder().encode(jsonStr);
+  var binary = Array.from(bytes).map(b => String.fromCharCode(b)).join('');
+  var content = btoa(binary);
   var payload = { message: '更新余额: ' + user + ' -> ¥' + amount.toFixed(2), content: content, branch: BRANCH };
   if (currentSha) payload.sha = currentSha;
 
