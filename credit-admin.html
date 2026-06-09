@@ -205,66 +205,78 @@ function saveAdmin() {
 }
 
 function saveToGitHub(name, amount, status, token) {
-  var PROXY = 'https://corsproxy.io/?';
   var apiUrl = 'https://api.github.com/repos/S-o-n-G-hua/merchant-app/contents/credit-data.json';
+  var el = document.getElementById('statusSaved');
   
-  // Step 1: GET current file through proxy
-  fetch(PROXY + apiUrl, {
-    headers: {
-      'Authorization': 'token ' + token,
-      'Accept': 'application/vnd.github.v3+json'
-    }
+  // Step 1: GET current file (direct GitHub API - same as admin.html for balances.json)
+  fetch(apiUrl, {
+    headers: {'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json'}
   })
-  .then(function(r) { return r.json(); })
+  .then(function(r) {
+    if (r.status !== 200) throw new Error('GET failed: ' + r.status);
+    return r.json();
+  })
   .then(function(fileData) {
+    // Decode content using TextEncoder-compatible method (same as admin.html)
+    var content;
     try {
-      var content = JSON.parse(base64ToUnicode(fileData.content));
+      var raw = atob(fileData.content);
+      var bytes = new Uint8Array(raw.length);
+      for (var i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+      content = JSON.parse(new TextDecoder().decode(bytes));
     } catch(e) {
       content = {users: {}, note: ''};
     }
     if (!content.users) content.users = {};
     content.users[name] = {
       amount: amount ? parseInt(amount) : 0,
-      status: status,
+      status: status || 'approved',
       updatedAt: new Date().toLocaleString('zh-CN')
     };
-    
-    var putBody = JSON.stringify({
-      message: 'update: 更新用户 ' + name + ' 的授信额度',
-      content: unicodeToBase64(JSON.stringify(content, null, 2)),
+
+    // Encode content (same method as admin.html)
+    var jsonStr = JSON.stringify(content, null, 2);
+    var enc = new TextEncoder().encode(jsonStr);
+    var binary = Array.from(enc).map(function(b){return String.fromCharCode(b)}).join('');
+    var b64content = btoa(binary);
+
+    // Step 2: PUT back (direct GitHub API)
+    var payload = {
+      message: 'update: 授信额度 ' + name + ' -> ¥' + (amount||0),
+      content: b64content,
       sha: fileData.sha,
       branch: 'main'
-    });
-    
-    // Step 2: PUT through proxy
-    return fetch(PROXY + apiUrl, {
+    };
+
+    return fetch(apiUrl, {
       method: 'PUT',
       headers: {
         'Authorization': 'token ' + token,
         'Content-Type': 'application/json',
         'Accept': 'application/vnd.github.v3+json'
       },
-      body: putBody
+      body: JSON.stringify(payload)
     });
   })
   .then(function(r) {
-    var el = document.getElementById('statusSaved');
     if (r.ok || r.status === 200 || r.status === 201) {
       el.textContent = '✅ 已保存到 GitHub，用户端可刷新查看';
+      el.style.color = '#10b981';
     } else {
-      r.text().then(function(txt) {
-        el.textContent = '❌ 保存失败(' + r.status + '): ' + txt.substring(0, 100);
+      return r.text().then(function(t){
+        el.textContent = '❌ 保存失败(' + r.status + '): ' + t.substring(0, 80);
+        el.style.color = '#ef4444';
       });
     }
     el.classList.add('show');
     setTimeout(function(){ el.classList.remove('show'); }, 4000);
   })
   .catch(function(err) {
-    var el = document.getElementById('statusSaved');
-    el.textContent = '❌ 网络错误: ' + err.message;
+    el.textContent = '❌ 错误: ' + err.message;
+    el.style.color = '#ef4444';
     el.classList.add('show');
     setTimeout(function(){ el.classList.remove('show'); }, 4000);
-    console.error('Save error:', err);
+    console.error('saveToGitHub error:', err);
   });
 }
 
