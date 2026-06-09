@@ -262,16 +262,10 @@ function deleteUser() {
 
     // --- Unicode-safe base64 helpers (fix mojibake) ---
     function unicodeToBase64(str) {
-      var bytes = new TextEncoder().encode(str);
-      var binary = '';
-      for (var i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
-      return btoa(binary);
+      return btoa(unescape(encodeURIComponent(str)));
     }
     function base64ToUnicode(b64) {
-      var binary = atob(b64);
-      var bytes = new Uint8Array(binary.length);
-      for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-      return new TextDecoder().decode(bytes);
+      return decodeURIComponent(escape(atob(b64)));
     }
 
     </script>
