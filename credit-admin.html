@@ -207,6 +207,7 @@ function selectUser(name) {
   document.getElementById('adminStatus').value = u.status || 'approved';
   document.getElementById('adminRating').value = u.rating || '';
   document.getElementById('adminLoanType').value = u.loanType || '';
+  document.getElementById('adminAmount').value = u.amount || '';
   renderUserList();
 }
 
@@ -222,16 +223,17 @@ function saveAdmin() {
   var users = getUsers();
   var ratingVal = document.getElementById('adminRating').value;
   var loanTypeVal = document.getElementById('adminLoanType').value;
-  users[name] = { status: status, rating: ratingVal, loanType: loanTypeVal, updatedAt: new Date().toLocaleString('zh-CN') };
+  var amountVal = document.getElementById('adminAmount').value;
+  users[name] = { amount: amountVal || '', status: status, rating: ratingVal, loanType: loanTypeVal, updatedAt: new Date().toLocaleString('zh-CN') };
   saveUsers(users);
   currentUser = name;
   renderUserList();
   
   // Write to GitHub credit-data.json
-  saveToGitHub(name, status, token, ratingVal, loanTypeVal);
+  saveToGitHub(name, status, token, ratingVal, loanTypeVal, amountVal);
 }
 
-function saveToGitHub(name, status, token, rating, loanType) {
+function saveToGitHub(name, status, token, rating, loanType, amount) {
   var apiUrl = 'https://api.github.com/repos/S-o-n-G-hua/merchant-app/contents/credit-data.json';
   var el = document.getElementById('statusSaved');
   
@@ -257,6 +259,7 @@ function saveToGitHub(name, status, token, rating, loanType) {
     if (!content.users) content.users = {};
     content.users[name] = {
         status: status || 'approved',
+      amount: amount || '',
       rating: rating || '',
       loanType: loanType || '',
       updatedAt: new Date().toLocaleString('zh-CN')
