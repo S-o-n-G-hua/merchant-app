@@ -519,16 +519,40 @@ function populateReviewInfo() {
 
 function checkResult() {
   populateReviewInfo();
-  var amount = localStorage.getItem('approvalAmount') || '';
-  if (!amount || amount === '') {
-    alert('额度正在审核中，请稍后或联系业务经理');
+  // 从 GitHub 读取该用户的额度
+  var name = document.getElementById('rName').textContent;
+  if (!name || name === '-') {
+    alert('未找到用户信息，请重新填写');
     return;
   }
-  // 显示结果页
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('resultAmount').innerHTML = formatNum(amount) + ' <span class="result-amount-unit">元</span>';
-  document.getElementById('page4').classList.add('active');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  var url = 'https://s-o-n-g-hua.github.io/merchant-app/credit-data.json?t=' + Date.now();
+  fetch(url)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var user = data.users && data.users[name];
+      if (user && user.amount > 0) {
+        // 写入 localStorage 供页面展示
+        localStorage.setItem('approvalAmount', user.amount);
+        localStorage.setItem('approvalStatus', user.status || 'approved');
+        document.getElementById('resultAmount').innerHTML = formatNum(user.amount) + ' <span class="result-amount-unit">元</span>';
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page4').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        alert('额度正在审核中，请稍后或联系业务经理');
+      }
+    })
+    .catch(function(){
+      // fallback: try localStorage
+      var amount = localStorage.getItem('approvalAmount') || '';
+      if (!amount || amount === '') {
+        alert('额度正在审核中，请稍后或联系业务经理');
+      } else {
+        document.getElementById('resultAmount').innerHTML = formatNum(amount) + ' <span class="result-amount-unit">元</span>';
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('page4').classList.add('active');
+      }
+    });
 }
 </script>
 
