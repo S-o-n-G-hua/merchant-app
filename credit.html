@@ -631,42 +631,69 @@ function populateReviewInfo() {
 
 
 function checkResult() {
-  // 直接从 GitHub 读取最新数据，不再依赖 localStorage 前置检查
-
+  // 用 api.github.com 读取（与 admin.html 完全一致，避免 CORS 问题）
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   var p5=document.getElementById('page5');if(p5)p5.classList.add('active');
-  
   populateReviewInfo();
-  
   var rNameEl=document.getElementById('rName');
   var name=rNameEl?rNameEl.textContent:'';
   if(!name||name==='-'){alert('未找到用户信息，请先填写申请');return;}
-  
-  var url='https://raw.githubusercontent.com/S-o-n-G-hua/merchant-app/main/credit-data.json?t='+Date.now();
-  fetch(url).then(function(r){return r.json();}).then(function(data){
-    var user=data.users&&data.users[name];
-    if(user && user && (Number(user.amount) > 0 || user.status === 'approved' || user.status === 'rejected')){
-      localStorage.setItem('approvalAmount',user.amount);
-      localStorage.setItem('approvalStatus',user.status||'approved');
-      if(user.rating)localStorage.setItem('githubRating',user.rating);
-      if(user.loanType)localStorage.setItem('githubLoanType',user.loanType);
-      var ra=document.getElementById('resultAmount');
-      if(ra)ra.innerHTML=formatNum(user.amount)+' <span class="result-amount-unit">元</span>';
-      document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-      var p4=document.getElementById('page4');if(p4)p4.classList.add('active');
-      window.scrollTo({top:0,behavior:'smooth'});
-    }else{
-      // 显示当前状态，不阻塞
-      var infoEl = document.getElementById('statusText');
-      if(infoEl) infoEl.textContent = user.status === 'rejected' ? '审批未通过' : '额度审核中，请稍后或联系业务经理';
+
+  // 用 ghApi 方式读取（同 admin.html 的 loadData 模式）
+  var token = GITHUB_TOKEN || '';
+  fetch('https://api.github.com/repos/S-o-n-G-hua/merchant-app/contents/credit-data.json?ref=main', {
+    headers: {
+      'Authorization': token ? 'token ' + token : '',
+      'User-Agent': 'merchant-app'
     }
-  }).catch(function(){
-    var amt=localStorage.getItem('approvalAmount')||'';
-    if(!amt||amt===''){alert('网络错误，请检查网络后重试');return;}
-    var ra=document.getElementById('resultAmount');
-    if(ra)ra.innerHTML=formatNum(amt)+' <span class="result-amount-unit">元</span>';
+  })
+  .then(function(r){return r.json();})
+  .then(function(res) {
+    if (!res.content) {
+      var infoEl = document.getElementById('statusText');
+      if(infoEl) infoEl.textContent = '无法获取数据，请稍后重试';
+      return;
+    }
+    try {
+      var raw = atob(res.content.replace(/\n/g,''));
+      var bytes = Uint8Array.from(raw, function(c){return c.charCodeAt(0);});
+      var decoded = new TextDecoder('utf-8').decode(bytes);
+      var data = JSON.parse(decoded);
+    } catch(e) {
+      var infoEl = document.getElementById('statusText');
+      if(infoEl) infoEl.textContent = '数据解析失败';
+      return;
+    }
+
+    var user = data.users && data.users[name];
+    if (user && (Number(user.amount) > 0 || user.status === 'approved' || user.status === 'rejected')) {
+      // 有结果 — 跳转到结果页
+      localStorage.setItem('approvalAmount', user.amount);
+      localStorage.setItem('approvalStatus', user.status || 'approved');
+      if (user.rating) localStorage.setItem('githubRating', user.rating);
+      if (user.loanType) localStorage.setItem('githubLoanType', user.loanType);
+      var ra = document.getElementById('resultAmount');
+      if (ra) ra.innerHTML = formatNum(user.amount) + ' <span class="result-amount-unit">元</span>';
+      document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+      var p4 = document.getElementById('page4'); if (p4) p4.classList.add('active');
+      window.scrollTo({top:0, behavior:'smooth'});
+    } else {
+      // 还在审核中
+      var infoEl = document.getElementById('statusText');
+      if (infoEl) infoEl.textContent = user ? ('状态: ' + (user.status||'审核中')) : '额度审核中，请稍后或联系业务经理';
+    }
+  })
+  .catch(function(err) {
+    var amt = localStorage.getItem('approvalAmount')||'';
+    if (!amt || amt==='') {
+      var infoEl = document.getElementById('statusText');
+      if (infoEl) infoEl.textContent = '网络错误，请检查后重试';
+      return;
+    }
+    var ra = document.getElementById('resultAmount');
+    if (ra) ra.innerHTML = formatNum(amt) + ' <span class="result-amount-unit">元</span>';
     document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-    var p4=document.getElementById('page4');if(p4)p4.classList.add('active');
+    var p4 = document.getElementById('page4'); if (p4) p4.classList.add('active');
   });
 }
 
