@@ -205,25 +205,25 @@ function saveAdmin() {
 }
 
 function saveToGitHub(name, amount, status, token) {
-  // First get current file
   var getReq = new XMLHttpRequest();
   getReq.open('GET', 'https://api.github.com/repos/S-o-n-G-hua/merchant-app/contents/credit-data.json');
   getReq.setRequestHeader('Authorization', 'token ' + token);
   getReq.onload = function() {
     if (getReq.status === 200) {
       var fileData = JSON.parse(getReq.responseText);
-      var content = JSON.parse(atob(fileData.content));
+      var content = JSON.parse(base64ToUnicode(fileData.content));
       if (!content.users) content.users = {};
-      content.users[name] = { amount: amount ? parseInt(amount) : 0, status: status, updatedAt: new Date().toLocaleString('zh-CN') };
-      
-      // Commit update
+      content.users[name] = {
+        amount: amount ? parseInt(amount) : 0,
+        status: status,
+        updatedAt: new Date().toLocaleString('zh-CN')
+      };
       var putData = {
         message: 'update: 更新用户 ' + name + ' 的授信额度',
-        content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
+        content: unicodeToBase64(JSON.stringify(content, null, 2)),
         sha: fileData.sha,
         branch: 'main'
       };
-      
       var putReq = new XMLHttpRequest();
       putReq.open('PUT', 'https://api.github.com/repos/S-o-n-G-hua/merchant-app/contents/credit-data.json');
       putReq.setRequestHeader('Authorization', 'token ' + token);
