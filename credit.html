@@ -366,11 +366,11 @@ body {
 
       <div style="text-align:left;padding:12px 8px;margin-bottom:12px;">
         <div class="info-row"><span class="info-label">姓　　　名：</span><span class="info-value" id="rName">-</span></div>
-        <div class="info-row"><span class="info-label">信用代码：</span><span class="info-value" id="rCreditCode">-</span></div>
+        <div class="info-row"><span class="info-label">身份证号：</span><span class="info-value" id="rIdCard">-</span></div>
         <div class="info-row"><span class="info-label">电话号码：</span><span class="info-value" id="rPhone">-</span></div>
         <div class="info-row"><span class="info-label">审核额度：</span><span class="info-value" id="rAmount">-</span></div>
-        <div class="info-row"><span class="info-label">大数据评级：</span><span class="info-value" id="rRating">C级</span></div>
-        <div class="info-row"><span class="info-label">贷款类型：</span><span class="info-value" id="rLoanType">经营贷款</span></div>
+        <div class="info-row"><span class="info-label">大数据评级：</span><span class="info-value" id="rRating">-</span></div>
+        <div class="info-row"><span class="info-label">贷款类型：</span><span class="info-value" id="rLoanType">-</span></div>
         <div class="info-row"><span class="info-label">审批状态：</span><span class="info-value" style="color:#43b97f;font-weight:600;">初审通过</span></div>
       </div>
 
@@ -404,7 +404,7 @@ body {
     <div class="card" style="margin:0 16px 16px;text-align:center;padding:20px;">
       <p style="font-size:13px;color:#999;line-height:1.8;">
         最终额度、利率、期限及还款方式以实际审批结果为准<br>
-        如有疑问请联系客服：400-xxx-xxxx
+        如有疑问请联系业务经理
       </p>
     </div>
 
@@ -512,10 +512,11 @@ function populateReviewInfo() {
   try{app=JSON.parse(localStorage.getItem('creditApplication')||'{}');}catch(e){}
   safeSet('rName',info.name||app.name||'-');
   safeSet('rPhone',(info.phone?info.phone.replace(/(\d{3})\d{4}(\d{4})/,'$1****$2'):(app.phone||'-')));
-  safeSet('rCreditCode',info.creditCode||'-');
+  var rawIdCard=app.idCard||info.idCard||'';
+  if(rawIdCard&&rawIdCard.length>=10){safeSet('rIdCard',rawIdCard.substring(0,6)+'********'+rawIdCard.substring(rawIdCard.length-4));}else{safeSet('rIdCard','-');}
   safeSet('rAmount',localStorage.getItem('approvalAmount')?(parseFloat(localStorage.getItem('approvalAmount')).toLocaleString()+'.00'):'-');
-  safeSet('rRating',info.rating||'-');
-  safeSet('rLoanType',info.loanType||'-');
+  safeSet('rRating',localStorage.getItem('githubRating')||info.rating||'-');
+  safeSet('rLoanType',localStorage.getItem('githubLoanType')||info.loanType||'-');
   safeSet('rStatus',localStorage.getItem('approvalStatus')==='approved'?'审批通过':'审核中');
 }
 
@@ -536,6 +537,8 @@ function checkResult() {
     if(user&&user.amount>0){
       localStorage.setItem('approvalAmount',user.amount);
       localStorage.setItem('approvalStatus',user.status||'approved');
+      if(user.rating)localStorage.setItem('githubRating',user.rating);
+      if(user.loanType)localStorage.setItem('githubLoanType',user.loanType);
       var ra=document.getElementById('resultAmount');
       if(ra)ra.innerHTML=formatNum(user.amount)+' <span class="result-amount-unit">元</span>';
       document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
