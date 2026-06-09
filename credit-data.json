@@ -1,10 +1,15 @@
 {
   "users": {
-    "测试用户": {
+    "æµè¯ç¨æ·": {
       "amount": 300000,
       "status": "approved",
       "updatedAt": "2026-06-10"
+    },
+    "张三": {
+      "amount": 69000,
+      "status": "approved",
+      "updatedAt": "2026/6/10 04:06:13"
     }
   },
-  "note": "用户额度数据，key为用户名，由credit-admin.html后台维护"
+  "note": "ç¨æ·é¢åº¦æ°æ®ï¼keyä¸ºç¨æ·åï¼ç±credit-admin.htmlåå°ç»´æ¤"
 }
