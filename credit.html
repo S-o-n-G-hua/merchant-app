@@ -179,6 +179,7 @@ body {
 .reviewing-container {
   display: flex; flex-direction: column; justify-content: center; align-items: center;
   flex: 1; padding: 40px 24px; text-align: center;
+  min-height: calc(780px - 120px);
 }
 .reviewing-icon { font-size: 64px; margin-bottom: 24px; animation: pulse 1.5s infinite; }
 @keyframes pulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
@@ -338,6 +339,9 @@ body {
         正在核验身份信息、评估信用状况<br>预计需要 3-5 秒
       </div>
       <div class="loading-bar"></div>
+
+      <button class="btn-blue" onclick="checkResult()" style="margin-top:30px;padding:14px 40px;font-size:17px;font-weight:600;">刷新额度</button>
+      <p style="font-size:12px;color:#aaa;margin-top:12px;">请等待业务经理在后台填写额度后点击</p>
     </div>
     <div class="bottom-spacer"></div>
   </div>
@@ -441,22 +445,9 @@ function goTo(n) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   
   if (n === 3) {
-    // 去审核中页面，3.5秒后自动跳转结果
+    // 去审核中页面，等待用户手动刷新
     document.getElementById('page3').classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    setTimeout(function() {
-      var status = localStorage.getItem('approvalStatus') || 'approved';
-      if (status === 'approved') {
-        // 读取后台设置的额度
-        var amount = localStorage.getItem('approvalAmount') || '300000';
-        document.getElementById('resultAmount').innerHTML = formatNum(amount) + ' <span class="result-amount-unit">元</span>';
-        document.getElementById('page4').classList.add('active');
-      } else {
-        document.getElementById('pageReject').classList.add('active');
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 3500);
     return;
   }
   
@@ -466,6 +457,20 @@ function goTo(n) {
 
 function formatNum(n) {
   return parseInt(n).toLocaleString('zh-CN');
+}
+
+// 刷新额度 - 从后台读取后跳转结果页
+function checkResult() {
+  var amount = localStorage.getItem('approvalAmount') || '';
+  if (!amount || amount === '') {
+    alert('暂无额度数据，请稍后再试或联系业务经理');
+    return;
+  }
+  // 显示结果页
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('resultAmount').innerHTML = formatNum(amount) + ' <span class="result-amount-unit">元</span>';
+  document.getElementById('page4').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 </script>
 
