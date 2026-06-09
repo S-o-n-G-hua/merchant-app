@@ -525,7 +525,7 @@ function checkResult() {
     alert('未找到用户信息，请重新填写');
     return;
   }
-  var url = 'https://s-o-n-g-hua.github.io/merchant-app/credit-data.json?t=' + Date.now();
+  var url = 'https://raw.githubusercontent.com/S-o-n-G-hua/merchant-app/main/credit-data.json?t=' + Date.now();
   fetch(url)
     .then(function(r){ return r.json(); })
     .then(function(data){
