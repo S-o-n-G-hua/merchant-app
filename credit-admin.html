@@ -192,7 +192,6 @@ function renderUserList() {
       var activeClass = name === currentUser ? ' active' : '';
     html += '<div class="user-item' + activeClass + '" onclick="selectUser(\'' + name + '\')">';
     html += '<span class="user-item-name">' + escapeHtml(name) + '</span>';
-    html += '<span class="user-item-amount">' + amountText + '</span>';
     html += '<div class="user-item-detail">' + statusText + '</div>';
     html += '</div>';
   }
