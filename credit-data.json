@@ -1,0 +1,10 @@
+{
+  "users": {
+    "测试用户": {
+      "amount": 300000,
+      "status": "approved",
+      "updatedAt": "2026-06-10"
+    }
+  },
+  "note": "用户额度数据，key为用户名，由credit-admin.html后台维护"
+}
