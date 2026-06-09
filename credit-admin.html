@@ -142,7 +142,7 @@ body {
     </div>
 
     <div class="field">
-      <label>最高最高可授信额度</label>
+      <label>最高最高最高可授信额度</label>
       <input type="number" id="adminAmount" placeholder="例如: 50000" min="0" step="100">
     </div>
 
@@ -162,10 +162,35 @@ body {
 
 
 <script>
-// ============================================================
-// 授信管理后台 — 完全照搬 admin.html 的 ghApi + currentSha 模式
-// ============================================================
 
+  function connectWithToken() {
+    const token = document.getElementById('token-input').value.trim();
+    if (!token) {
+      document.getElementById('token-status').textContent = '请输入 Token';
+      document.getElementById('token-status').style.color = '#e74c3c';
+      return;
+    }
+    GITHUB_TOKEN = token;
+    document.getElementById('token-status').textContent = '连接中...';
+    document.getElementById('token-status').style.color = '#666';
+    // 验证 token 是否有效
+    fetch('https://api.github.com/user', {
+      headers: { 'Authorization': 'token ' + token, 'User-Agent': 'node' }
+    }).then(function(r) {
+      if (r.ok) {
+        document.getElementById('token-section').style.display = 'none';
+        document.getElementById('main-container').style.display = 'block';
+        loadUserList();
+      } else {
+        document.getElementById('token-status').textContent = 'Token 无效，请重新输入';
+        document.getElementById('token-status').style.color = '#e74c3c';
+      }
+    }).catch(function() {
+      document.getElementById('token-status').textContent = '网络错误，请重试';
+      document.getElementById('token-status').style.color = '#e74c3c';
+    });
+  }
+  
 var TOKEN = '';
 var REPO = 'S-o-n-G-hua/merchant-app';
 var BRANCH = 'main';
@@ -175,9 +200,15 @@ var creditData = null;
 
 function showMsg(id, text, ok) {
   var el = document.getElementById(id);
-  if (!el) return;
   el.textContent = text;
   el.className = ok ? 'msg msg-success' : 'msg msg-error';
+}
+function hideMsg(id) { document.getElementById(id).style.display = 'none'; }
+
+function showCard(id) {
+  ['balance-card','edit-card','quick-card'].forEach(function(c) {
+    document.getElementById(c).style.display = c === id ? 'block' : 'none';
+  });
 }
 
 function ghApi(method, path, body) {
@@ -186,175 +217,106 @@ function ghApi(method, path, body) {
     headers: {
       'Authorization': 'token ' + TOKEN,
       'Content-Type': 'application/json',
-      'User-Agent': 'credit-admin'
+      'User-Agent': 'merchant-admin'
     }
   };
   if (body) opts.body = JSON.stringify(body);
   return fetch('https://api.github.com' + path, opts).then(function(r) { return r.json(); });
 }
 
-// 加载数据（连接按钮触发）
 function loadCreditData() {
   TOKEN = document.getElementById('gh-token').value.trim();
-  if (!TOKEN) { showMsg('save-msg', '请输入 GitHub Token', false); return; }
+  if (!TOKEN) { showMsg('token-msg', '请输入 Token', false); return; }
 
-  showMsg('save-msg', '连接中...', false);
-
+  // 验证 token 并获取 balances.json
   ghApi('GET', '/repos/' + REPO + '/contents/' + FILE_PATH + '?ref=' + BRANCH)
     .then(function(res) {
-      if (res.message) {
-        showMsg('save-msg', 'Token错误: ' + res.message, false);
+      if (res.message && res.message.indexOf('Bad credentials') >= 0) {
+        showMsg('token-msg', 'Token 无效或权限不足', false);
         return;
       }
       if (!res.content) {
-        showMsg('save-msg', '获取数据失败', false);
+        showMsg('token-msg', '获取数据失败: ' + (res.message || '未知错误'), false);
         return;
       }
-
-      // 关键：更新 SHA
       currentSha = res.sha;
-
-      // 解码内容
       var binary = atob(res.content.replace(/\n/g, ''));
-      var bytes = Uint8Array.from(binary, function(c) { return c.charCodeAt(0); });
+      var bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
       var decoded = new TextDecoder('utf-8').decode(bytes);
       creditData = JSON.parse(decoded);
 
+      showMsg('token-msg', '连接成功！已加载 ' + Object.keys(creditData.users || {}).length + ' 个用户', true);
+      document.getElementById('token-card').querySelector('.btn-primary').textContent = '重新连接';
+
       renderUserList();
-      showMsg('save-msg', '✅ 连接成功！共 ' + Object.keys(creditData.users || {}).length + ' 个用户', true);
+      document.getElementById('balance-card').style.display = 'block';
+      document.getElementById('quick-card').style.display = 'block';
     })
     .catch(function(err) {
-      showMsg('save-msg', '网络错误: ' + err.message, false);
+      showMsg('token-msg', '网络错误: ' + err.message, false);
     });
 }
 
-// 渲染用户列表
 function renderUserList() {
   var ul = document.getElementById('user-list');
-  if (!ul) return;
   var users = creditData.users || {};
   var keys = Object.keys(users);
-
   if (keys.length === 0) {
-    ul.innerHTML = '<li class="user-item" style="color:#999">暂无用户数据</li>';
+    ul.innerHTML = '<li class="empty">暂无用户数据，请通过「修改余额」添加</li>';
     return;
   }
-
   ul.innerHTML = keys.map(function(k) {
-    var u = users[k];
-    var statusText = u.status || 'pending';
-    var statusColor = statusText === 'approved' ? '#27ae60' : (statusText === 'rejected' ? '#e74c3c' : '#f39c12');
-    var amountText = u.amount ? ('¥' + Number(u.amount).toLocaleString()) : '-';
-    return '<li class="user-item" onclick="selectUser(\'' + k + '\')">' +
-      '<div class="user-item-name">' + k + '</div>' +
-      '<div class="user-item-amount">额度: ' + amountText + '</div>' +
-      '<div class="user-item-status" style="color:' + statusColor + '">' + statusText + '</div>' +
+    return '<li class="user-item">' +
+      '<div class="user-info"><span>' + k + '</span><br><small>最后更新: ' + (creditData.updatedAt || '-') + '</small></div>' +
+      '<div class="user-balance">¥ ' + parseFloat(users[k]).toFixed(2) + '</div>' +
+      '<button class="btn btn-sm btn-primary" style="margin-left:10px" onclick="editUser(\'' + k + '\')">&#9998;</button>' +
       '</li>';
   }).join('');
 }
 
-// 选择用户
 function selectUser(name) {
-  document.getElementById('adminName').value = name;
-  var u = creditData.users[name];
-  if (u) {
-    document.getElementById('adminStatus').value = u.status || 'pending';
-    var amtEl = document.getElementById('adminAmount');
-    if (amtEl) amtEl.value = u.amount || '';
-    var ratingEl = document.getElementById('adminRating');
-    if (ratingEl && u.rating) ratingEl.value = u.rating;
-    var loanEl = document.getElementById('adminLoanType');
-    if (loanEl && u.loanType) loanEl.value = u.loanType;
-  }
+  document.getElementById('edit-user').value = username;
+  document.getElementById('edit-amount').value = creditData.users[username] || 0;
+  showCard('edit-card');
 }
 
-// 保存设置（核心函数，完全照搬 saveBalance）
 function saveAdmin() {
-  var name = document.getElementById('adminName').value.trim();
-  if (!name) { showMsg('save-msg', '请输入或选择用户名', false); return; }
+  var user = document.getElementById('edit-user').value.trim();
+  var amount = parseFloat(document.getElementById('edit-amount').value);
+  if (!user) { showMsg('edit-msg', '请输入用户名', false); return; }
+  if (isNaN(amount)) { showMsg('edit-msg', '请输入有效金额', false); return; }
 
-  var statusVal = document.getElementById('adminStatus').value;
-  var amtEl = document.getElementById('adminAmount');
-  var amountVal = amtEl ? amtEl.value.trim() : '';
-  var ratingEl = document.getElementById('adminRating');
-  var ratingVal = ratingEl ? ratingEl.value : '';
-  var loanEl = document.getElementById('adminLoanType');
-  var loanTypeVal = loanEl ? loanEl.value : '';
-
-  if (!currentSha) {
-    showMsg('save-msg', '请先点击「连接并加载」获取最新数据', false);
-    return;
-  }
-
-  // 初始化数据结构
-  if (!creditData) creditData = { users: {}, note: '用户额度数据' };
+  if (!creditData) creditData = { users: {} };
   if (!creditData.users) creditData.users = {};
+  creditData.users[user] = amount;
+  creditData.updatedAt = new Date().toISOString();
+  creditData.updatedBy = 'admin';
 
-  // 更新用户数据
-  creditData.users[name] = {
-    status: statusVal,
-    amount: amountVal,
-    rating: ratingVal,
-    loanType: loanTypeVal,
-    updatedAt: new Date().toLocaleString('zh-CN')
-  };
-
-  // 编码（与 admin.html 完全一致的方式）
   var jsonStr = JSON.stringify(creditData, null, 2);
   var bytes = new TextEncoder().encode(jsonStr);
-  var binary = Array.from(bytes).map(function(b) { return String.fromCharCode(b); }).join('');
+  var binary = Array.from(bytes).map(b => String.fromCharCode(b)).join('');
   var content = btoa(binary);
-
-  // 构造 payload（必须带 currentSha！）
-  var payload = {
-    message: '更新授信: ' + name + ' -> ' + statusVal + (amountVal ? ' ¥'+amountVal : ''),
-    content: content,
-    sha: currentSha,   // ← 关键！每次 PUT 必须带最新的 SHA
-    branch: BRANCH
-  };
-
-  showMsg('save-msg', '保存中...', false);
+  var payload = { message: '更新余额: ' + user + ' -> ¥' + amount.toFixed(2), content: content, branch: BRANCH };
+  if (currentSha) payload.sha = currentSha;
 
   ghApi('PUT', '/repos/' + REPO + '/contents/' + FILE_PATH, payload)
     .then(function(res) {
       if (res.content) {
-        // 成功后立即更新 SHA（关键！下次 PUT 要用新 SHA）
         currentSha = res.content.sha;
-        showMsg('save-msg', '✅ 保存成功！' + name + ' 已更新', true);
+        showMsg('edit-msg', '保存成功！' + user + ' 的余额已更新为 ¥' + amount.toFixed(2), true);
         renderUserList();
+        showCard('balance-card');
       } else {
-        showMsg('save-msg', '❌ 保存失败: ' + (res.message || '未知错误'), false);
+        showMsg('edit-msg', '保存失败: ' + (res.message || '未知错误'), false);
       }
     })
     .catch(function(err) {
-      showMsg('save-msg', '❌ 网络错误: ' + err.message, false);
+      showMsg('edit-msg', '网络错误: ' + err.message, false);
     });
 }
 
-// 删除用户
-function deleteUser() {
-  var name = document.getElementById('adminName').value.trim();
-  if (!name || !creditData || !creditData.users[name]) return;
-  delete creditData.users[name];
-
-  var jsonStr = JSON.stringify(creditData, null, 2);
-  var bytes = new TextEncoder().encode(jsonStr);
-  var binary = Array.from(bytes).map(function(b) { return String.fromCharCode(b); }).join('');
-  var content = btoa(binary);
-
-  var payload = { message: '删除用户: ' + name, content: content, sha: currentSha, branch: BRANCH };
-
-  ghApi('PUT', '/repos/' + REPO + '/contents/' + FILE_PATH, payload)
-    .then(function(res) {
-      if (res.content) {
-        currentSha = res.content.sha;
-        showMsg('save-msg', '✅ 已删除 ' + name, true);
-        renderUserList();
-        document.getElementById('adminName').value = '';
-      } else {
-        showMsg('save-msg', '删除失败: ' + (res.message || ''), false);
-      }
-    });
+function refreshFromRemote() {
+  loadData();
 }
 </script>
 
