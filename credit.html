@@ -754,22 +754,8 @@ function fetchCreditDataFromGitHub(name, idCard, token) {
 }
 
 function manualCheck() {
-  var name = localStorage.getItem('creditName') || '张三';
-  var idCard = localStorage.getItem('creditIdCard') || '';
-  var token = localStorage.getItem('githubToken') || localStorage.getItem('adminToken') || '';
-  if (!token) {
-    alert('额度正在审核中，请稍后或联系业务经理');
-    return;
-  }
-  fetchCreditDataFromGitHub(name, idCard, token);
-  setTimeout(function() {
-    var r = localStorage.getItem('githubRating') || '';
-    if (r) {
-      checkResult();
-    } else {
-      alert('后台尚未填写，请耐心等待');
-    }
-  }, 2000);
+  // 直接调 checkResult 从 GitHub 读取最新数据
+  checkResult();
 }
 
 // 页面跳转时启动自动检查
