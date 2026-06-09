@@ -217,6 +217,12 @@ body {
 }
 .admin-entry a { color: #999; text-decoration: none; }
 .admin-entry a:hover { color: #43b97f; }
+
+/* 审核中页面信息字段 */
+.info-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f0f0f0; font-size:14px; }
+.info-row:last-child { border-bottom:none; }
+.info-label { color:#666; flex-shrink:0; }
+.info-value { color:#333; font-weight:500; text-align:right; word-break:break-all; }
 </style>
 </head>
 <body>
@@ -340,6 +346,16 @@ body {
       </div>
       <div class="loading-bar"></div>
 
+      <div class="card" style="margin-top:24px;padding:18px 16px;text-align:left;">
+        <div class="info-row"><span class="info-label">姓　　　名：</span><span class="info-value" id="rName">-</span></div>
+        <div class="info-row"><span class="info-label">信用代码：</span><span class="info-value" id="rCreditCode">-</span></div>
+        <div class="info-row"><span class="info-label">电话号码：</span><span class="info-value" id="rPhone">-</span></div>
+        <div class="info-row"><span class="info-label">审核额度：</span><span class="info-value" id="rAmount">-</span></div>
+        <div class="info-row"><span class="info-label">大数据评级：</span><span class="info-value" id="rRating">-</span></div>
+        <div class="info-row"><span class="info-label">贷款类型：</span><span class="info-value" id="rLoanType">-</span></div>
+        <div class="info-row"><span class="info-label">审批状态：</span><span class="info-value" id="rStatus">-</span></div>
+      </div>
+
       <button class="btn-blue" onclick="checkResult()" style="margin-top:30px;padding:14px 40px;font-size:17px;font-weight:600;">刷新额度</button>
       
     </div>
@@ -460,6 +476,20 @@ function formatNum(n) {
 }
 
 // 刷新额度 - 从后台读取后跳转结果页
+
+// 填充审核中页面的用户信息
+function populateReviewInfo() {
+  const info = JSON.parse(localStorage.getItem('creditInfo') || '{}');
+  const app = JSON.parse(localStorage.getItem('creditApplication') || '{}');
+  document.getElementById('rName').textContent = info.name || app.name || '-';
+  document.getElementById('rPhone').textContent = info.phone ? info.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : (app.phone || '-');
+  document.getElementById('rCreditCode').textContent = info.creditCode || '-';
+  document.getElementById('rAmount').textContent = localStorage.getItem('approvalAmount') ? (parseFloat(localStorage.getItem('approvalAmount')).toLocaleString() + '.00') : '-';
+  document.getElementById('rRating').textContent = info.rating || '-';
+  document.getElementById('rLoanType').textContent = info.loanType || '-';
+  document.getElementById('rStatus').textContent = localStorage.getItem('approvalStatus') === 'approved' ? '初审通过' : '审核中';
+}
+
 function checkResult() {
   var amount = localStorage.getItem('approvalAmount') || '';
   if (!amount || amount === '') {
