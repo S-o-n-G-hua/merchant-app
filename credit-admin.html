@@ -221,7 +221,7 @@ function saveAdmin() {
   var users = getUsers();
   var ratingVal = document.getElementById('adminRating').value;
   var loanTypeVal = document.getElementById('adminLoanType').value;
-  users[name] = { amount: amount || '', status: status, rating: ratingVal, loanType: loanTypeVal, updatedAt: new Date().toLocaleString('zh-CN') };
+  users[name] = { status: status, rating: ratingVal, loanType: loanTypeVal, updatedAt: new Date().toLocaleString('zh-CN') };
   saveUsers(users);
   currentUser = name;
   renderUserList();
