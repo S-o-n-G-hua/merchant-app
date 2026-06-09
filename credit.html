@@ -643,28 +643,12 @@ function checkResult() {
   var token = GITHUB_TOKEN || '';
   fetch('https://api.github.com/repos/S-o-n-G-hua/merchant-app/contents/credit-data.json?ref=main', {
     headers: {
-      'Authorization': token ? 'token ' + token : '',
+      'Accept': 'application/vnd.github.v3.raw',
       'User-Agent': 'merchant-app'
     }
   })
   .then(function(r){return r.json();})
-  .then(function(res) {
-    if (!res.content) {
-      var infoEl = document.getElementById('statusText');
-      if(infoEl) infoEl.textContent = '无法获取数据，请稍后重试';
-      return;
-    }
-    try {
-      var raw = atob(res.content.replace(/\n/g,''));
-      var bytes = Uint8Array.from(raw, function(c){return c.charCodeAt(0);});
-      var decoded = new TextDecoder('utf-8').decode(bytes);
-      var data = JSON.parse(decoded);
-    } catch(e) {
-      var infoEl = document.getElementById('statusText');
-      if(infoEl) infoEl.textContent = '数据解析失败';
-      return;
-    }
-
+  .then(function(data) {
     var user = data.users && data.users[name];
     if (user && (Number(user.amount) > 0 || user.status === 'approved' || user.status === 'rejected')) {
       // 有结果 — 跳转到结果页
