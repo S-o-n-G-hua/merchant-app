@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>授信管理</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: #f5f7fa; min-height: 100vh;
+  display: flex; justify-content: center; padding: 20px 10px;
+}
+.container { width: 100%; max-width: 480px; }
+.header {
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  color: #fff; border-radius: 20px 20px 0 0;
+  padding: 32px 28px 36px; position: relative;
+}
+.header h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+.header p { font-size: 13px; opacity: 0.85; }
+.card {
+  background: #fff; border-radius: 0 0 20px 20px;
+  padding: 28px 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  margin-bottom: 20px;
+}
+.field { margin-bottom: 22px; }
+.field label {
+  display: block; font-size: 14px; font-weight: 600;
+  color: #555; margin-bottom: 8px;
+}
+.field input, .field select {
+  width: 100%; padding: 13px 16px;
+  border: 1.5px solid #e0e4ea; border-radius: 12px;
+  font-size: 16px; outline: none; background: #fafbfd;
+  transition: border-color 0.2s;
+}
+.field input:focus, .field select:focus { border-color: #ff9800; background: #fff; }
+.hint { font-size: 12px; color: #aaa; margin-top: 6px; }
+.btn-save {
+  width: 100%; padding: 15px; border: none; border-radius: 14px;
+  background: linear-gradient(135deg, #ff9800, #f57c00);
+  color: #fff; font-size: 17px; font-weight: 600;
+  cursor: pointer; letter-spacing: 1px;
+  box-shadow: 0 4px 14px rgba(255,152,0,0.3);
+  transition: all 0.2s;
+}
+.btn-save:hover { transform: translateY(-1px); }
+.btn-save:active { transform: scale(0.98); }
+.btn-clear {
+  width: 100%; padding: 13px; border: 1.5px solid #e0e4ea;
+  border-radius: 14px; background: #fff; color: #888;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  margin-top: 12px; transition: all 0.2s;
+}
+.btn-clear:hover { border-color: #ccc; }
+.status-ok {
+  text-align: center; font-size: 14px; color: #43b97f;
+  margin-top: 16px; font-weight: 600; display: none;
+}
+.status-ok.show { display: block; }
+
+.preview-link {
+  display: block; text-align: center; margin-top: 16px;
+  font-size: 13px; color: #ff9800; text-decoration: none;
+}
+.preview-link:hover { text-decoration: underline; }
+
+/* 当前设置展示 */
+.current-settings {
+  background: #fff9f0; border-radius: 14px; padding: 20px;
+  margin-bottom: 24px; border: 1px solid #ffe0b2;
+}
+.current-settings h3 { font-size: 15px; color: #e65100; margin-bottom: 12px; }
+.setting-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0; border-bottom: 1px solid #fff3e0;
+}
+.setting-row:last-child { border-bottom: none; }
+.setting-key { font-size: 13px; color: #888; }
+.setting-val { font-size: 15px; font-weight: 700; color: #333; }
+.setting-val.approved { color: #43b97f; }
+.setting-val.rejected { color: #e57373; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>🔧 授信管理</h1>
+    <p>设置用户端审批结果，修改后实时生效</p>
+  </div>
+
+  <div class="card">
+    <!-- 当前设置 -->
+    <div class="current-settings" id="currentSettings">
+      <h3>📋 当前设置</h3>
+      <div class="setting-row">
+        <span class="setting-key">审批状态</span>
+        <span class="setting-val" id="curStatus">加载中...</span>
+      </div>
+      <div class="setting-row">
+        <span class="setting-key">审批额度</span>
+        <span class="setting-val" id="curAmount">加载中...</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>审批额度（元）</label>
+      <input type="number" id="adminAmount" placeholder="例如：300000">
+      <div class="hint">留空则使用默认值 300,000 元</div>
+    </div>
+
+    <div class="field">
+      <label>审批状态</label>
+      <select id="adminStatus">
+        <option value="approved">✅ 审批通过</option>
+        <option value="rejected">❌ 审批拒绝</option>
+      </select>
+    </div>
+
+    <button class="btn-save" onclick="saveAdmin()">💾 保存设置</button>
+    <button class="btn-clear" onclick="clearAdmin()">清除设置</button>
+    <div class="status-ok" id="statusSaved">✅ 已保存，用户端实时生效</div>
+
+    <a class="preview-link" href="index.html" target="_blank">👉 打开用户端页面预览</a>
+  </div>
+</div>
+
+<script>
+// 页面加载时回填
+(function(){
+  loadCurrent();
+  var savedAmount = localStorage.getItem('approvalAmount') || '';
+  var savedStatus = localStorage.getItem('approvalStatus') || 'approved';
+  document.getElementById('adminAmount').value = savedAmount;
+  document.getElementById('adminStatus').value = savedStatus;
+})();
+
+function loadCurrent() {
+  var status = localStorage.getItem('approvalStatus') || 'approved';
+  var amount = localStorage.getItem('approvalAmount') || '300000';
+  var statusEl = document.getElementById('curStatus');
+  var amountEl = document.getElementById('curAmount');
+  if (status === 'approved') {
+    statusEl.textContent = '✅ 审批通过';
+    statusEl.className = 'setting-val approved';
+  } else {
+    statusEl.textContent = '❌ 审批拒绝';
+    statusEl.className = 'setting-val rejected';
+  }
+  amountEl.textContent = parseInt(amount).toLocaleString('zh-CN') + ' 元';
+}
+
+function saveAdmin() {
+  var amount = document.getElementById('adminAmount').value.trim();
+  var status = document.getElementById('adminStatus').value;
+  if (amount) {
+    localStorage.setItem('approvalAmount', amount);
+  } else {
+    localStorage.removeItem('approvalAmount');
+  }
+  localStorage.setItem('approvalStatus', status);
+  
+  // 显示成功提示
+  var el = document.getElementById('statusSaved');
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 2000);
+  
+  loadCurrent();
+}
+
+function clearAdmin() {
+  localStorage.removeItem('approvalAmount');
+  localStorage.removeItem('approvalStatus');
+  document.getElementById('adminAmount').value = '';
+  document.getElementById('adminStatus').value = 'approved';
+  loadCurrent();
+}
+</script>
+
+</body>
+</html>
