@@ -114,6 +114,12 @@ body {
       </select>
     </div>
 
+    
+    <div class="field">
+      <label>GitHub Token（用于写入额度数据）</label>
+      <input type="password" id="adminToken" placeholder="ghp_xxxxxxxxxxxx">
+      <div class="hint">需要 repo 权限的 Personal Access Token</div>
+    </div>
     <button class="btn-save" onclick="saveAdmin()">💾 保存设置</button>
     <button class="btn-del" onclick="deleteUser()">🗑 删除该用户</button>
     <div class="status-ok" id="statusSaved">✅ 已保存，用户端实时生效</div>
@@ -183,16 +189,61 @@ function saveAdmin() {
   if (!name) { alert('请输入用户姓名'); return; }
   var amount = document.getElementById('adminAmount').value.trim();
   var status = document.getElementById('adminStatus').value;
+  var token = document.getElementById('adminToken').value.trim();
+  
+  if (!token) { alert('请先填写 GitHub Token'); return; }
+  
+  // Update local list
   var users = getUsers();
   users[name] = { amount: amount || '', status: status, updatedAt: new Date().toLocaleString('zh-CN') };
   saveUsers(users);
   currentUser = name;
-  if (amount) localStorage.setItem('approvalAmount', amount);
-  localStorage.setItem('approvalStatus', status);
   renderUserList();
-  var el = document.getElementById('statusSaved');
-  el.classList.add('show');
-  setTimeout(function(){ el.classList.remove('show'); }, 2000);
+  
+  // Write to GitHub credit-data.json
+  saveToGitHub(name, amount, status, token);
+}
+
+function saveToGitHub(name, amount, status, token) {
+  // First get current file
+  var getReq = new XMLHttpRequest();
+  getReq.open('GET', 'https://api.github.com/repos/S-o-n-G-hua/merchant-app/contents/credit-data.json');
+  getReq.setRequestHeader('Authorization', 'token ' + token);
+  getReq.onload = function() {
+    if (getReq.status === 200) {
+      var fileData = JSON.parse(getReq.responseText);
+      var content = JSON.parse(atob(fileData.content));
+      if (!content.users) content.users = {};
+      content.users[name] = { amount: amount ? parseInt(amount) : 0, status: status, updatedAt: new Date().toLocaleString('zh-CN') };
+      
+      // Commit update
+      var putData = {
+        message: 'update: 更新用户 ' + name + ' 的授信额度',
+        content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
+        sha: fileData.sha,
+        branch: 'main'
+      };
+      
+      var putReq = new XMLHttpRequest();
+      putReq.open('PUT', 'https://api.github.com/repos/S-o-n-G-hua/merchant-app/contents/credit-data.json');
+      putReq.setRequestHeader('Authorization', 'token ' + token);
+      putReq.setRequestHeader('Content-Type', 'application/json');
+      putReq.onload = function() {
+        var el = document.getElementById('statusSaved');
+        if (putReq.status === 200 || putReq.status === 201) {
+          el.textContent = '✅ 已保存到 GitHub，用户端可刷新查看';
+        } else {
+          el.textContent = '❌ GitHub 保存失败，请检查 Token 权限';
+        }
+        el.classList.add('show');
+        setTimeout(function(){ el.classList.remove('show'); }, 3000);
+      };
+      putReq.send(JSON.stringify(putData));
+    } else {
+      alert('获取 credit-data.json 失败，请检查 Token 权限');
+    }
+  };
+  getReq.send();
 }
 
 function deleteUser() {
