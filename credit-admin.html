@@ -71,7 +71,6 @@ body {
 .user-item.active { border-color: #ff9800; background: #fff3e0; box-shadow: 0 2px 8px rgba(255,152,0,0.15); }
 .user-item-name { font-size: 16px; font-weight: 700; color: #333; }
 .user-item-detail { font-size: 13px; color: #888; margin-top: 4px; }
-.user-item-amount { font-size: 18px; font-weight: 700; color: #e65100; position:absolute; right:18px; top:16px; }
 
 .preview-link {
   display: block; text-align: center; margin-top: 16px;
@@ -85,7 +84,7 @@ body {
 <div class="container">
   <div class="header">
     <h1>🔧 授信管理</h1>
-    <p>按用户设置审批额度，修改后实时生效</p>
+    <p>按用户设置审批状态，修改后实时生效</p>
   </div>
 
   <div class="card">
@@ -193,8 +192,7 @@ function renderUserList() {
     var name = keys[i];
     var u = users[name];
     var statusText = u.status === 'approved' ? '✅ 通过' : '❌ 拒绝';
-    var amountText = u.amount ? parseInt(u.amount).toLocaleString('zh-CN') + ' 元' : '-';
-    var activeClass = name === currentUser ? ' active' : '';
+      var activeClass = name === currentUser ? ' active' : '';
     html += '<div class="user-item' + activeClass + '" onclick="selectUser(\'' + name + '\')">';
     html += '<span class="user-item-name">' + escapeHtml(name) + '</span>';
     html += '<span class="user-item-amount">' + amountText + '</span>';
@@ -209,7 +207,6 @@ function selectUser(name) {
   var users = getUsers();
   var u = users[name] || {};
   document.getElementById('adminName').value = name;
-  document.getElementById('adminAmount').value = u.amount || '';
   document.getElementById('adminStatus').value = u.status || 'approved';
   document.getElementById('adminRating').value = u.rating || '';
   document.getElementById('adminLoanType').value = u.loanType || '';
@@ -219,7 +216,6 @@ function selectUser(name) {
 function saveAdmin() {
   var name = document.getElementById('adminName').value.trim();
   if (!name) { alert('请输入用户姓名'); return; }
-  var amount = document.getElementById('adminAmount').value.trim();
   var status = document.getElementById('adminStatus').value;
   var token = document.getElementById('adminToken').value.trim();
   
@@ -238,7 +234,7 @@ function saveAdmin() {
   saveToGitHub(name, amount, status, token, ratingVal, loanTypeVal);
 }
 
-function saveToGitHub(name, amount, status, token, rating, loanType) {
+function saveToGitHub(name, status, token, rating, loanType) {
   var apiUrl = 'https://api.github.com/repos/S-o-n-G-hua/merchant-app/contents/credit-data.json';
   var el = document.getElementById('statusSaved');
   
@@ -263,8 +259,7 @@ function saveToGitHub(name, amount, status, token, rating, loanType) {
     }
     if (!content.users) content.users = {};
     content.users[name] = {
-      amount: amount ? parseInt(amount) : 0,
-      status: status || 'approved',
+        status: status || 'approved',
       rating: rating || '',
       loanType: loanType || '',
       updatedAt: new Date().toLocaleString('zh-CN')
@@ -278,7 +273,7 @@ function saveToGitHub(name, amount, status, token, rating, loanType) {
 
     // Step 2: PUT back (direct GitHub API)
     var payload = {
-      message: 'update: 授信额度 ' + name + ' -> ¥' + (amount||0),
+      message: 'update: 授信状态 ' + name + ' -> ' + (status||'pending'),
       content: b64content,
       sha: fileData.sha,
       branch: 'main'
@@ -325,7 +320,6 @@ function deleteUser() {
   saveUsers(users);
   currentUser = '';
   document.getElementById('adminName').value = '';
-  document.getElementById('adminAmount').value = '';
   document.getElementById('adminStatus').value = 'approved';
   document.getElementById('adminRating').value = '';
   document.getElementById('adminLoanType').value = '';
