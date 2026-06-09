@@ -631,59 +631,61 @@ function populateReviewInfo() {
 
 
 function checkResult() {
-  // 用 api.github.com 读取（与 admin.html 完全一致，避免 CORS 问题）
-  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-  var p5=document.getElementById('page5');if(p5)p5.classList.add('active');
-  populateReviewInfo();
-  var rNameEl=document.getElementById('rName');
-  var name=rNameEl?rNameEl.textContent:'';
-  if(!name||name==='-'){alert('未找到用户信息，请先填写申请');return;}
+  // 从 GitHub API 读取后台填写的最新数据
+  var rNameEl = document.getElementById('rName');
+  var name = rNameEl ? rNameEl.textContent : '';
+  if (!name || name === '-') {
+    alert('未找到用户信息，请先填写申请');
+    return;
+  }
 
-  // 用 ghApi 方式读取（同 admin.html 的 loadData 模式）
-  var token = GITHUB_TOKEN || '';
+  var btn = document.querySelector('.refresh-btn') || document.querySelector('button[onclick*="manualCheck"]');
+  if (btn) { btn.disabled = true; btn.textContent = '查询中...'; }
+
   fetch('https://api.github.com/repos/S-o-n-G-hua/merchant-app/contents/credit-data.json?ref=main', {
-    headers: {
-      'Accept': 'application/vnd.github.v3.raw',
-      'User-Agent': 'merchant-app'
-    }
+    headers: { 'Accept': 'application/vnd.github.v3.raw', 'User-Agent': 'merchant-app' }
   })
-  .then(function(r){return r.json();})
+  .then(function(r) { return r.json(); })
   .then(function(data) {
+    // 恢复按钮
+    if (btn) { btn.disabled = false; btn.textContent = '进度刷新'; }
+
     var user = data.users && data.users[name];
-    if (user && (Number(user.amount) > 0 || user.status === 'approved' || user.status === 'rejected')) {
-      // 有结果 — 跳转到结果页
-      localStorage.setItem('approvalAmount', user.amount);
-      localStorage.setItem('approvalStatus', user.status || 'approved');
-      if (user.rating) localStorage.setItem('githubRating', user.rating);
-      if (user.loanType) localStorage.setItem('githubLoanType', user.loanType);
-      var ra = document.getElementById('resultAmount');
-      if (ra) ra.innerHTML = formatNum(user.amount) + ' <span class="result-amount-unit">元</span>';
-      document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-      var p4 = document.getElementById('page4'); if (p4) p4.classList.add('active');
-      window.scrollTo({top:0, behavior:'smooth'});
-    } else {
-      // 还在审核中
-      var infoEl = document.getElementById('statusText');
-      if (infoEl) infoEl.textContent = user ? ('状态: ' + (user.status||'审核中')) : '额度审核中，请稍后或联系业务经理';
-    }
-  })
-  .catch(function(err) {
-    var amt = localStorage.getItem('approvalAmount')||'';
-    if (!amt || amt==='') {
-      var infoEl = document.getElementById('statusText');
-      if (infoEl) infoEl.textContent = '网络错误，请检查后重试';
+    if (!user) {
+      alert('未找到您的申请记录，请先提交申请');
       return;
     }
+
+    // 检查后台是否已填写审批信息（有 status 就算处理过）
+    if (!user.status || user.status === 'pending') {
+      alert('额度正在审核中，请稍后或联系业务经理');
+      return;
+    }
+
+    // === 后台已填写 → 存入 localStorage 并跳转到结果页 ===
+    if (user.amount) localStorage.setItem('approvalAmount', user.amount);
+    if (user.status) localStorage.setItem('approvalStatus', user.status);
+    if (user.rating) localStorage.setItem('githubRating', user.rating);
+    if (user.loanType) localStorage.setItem('githubLoanType', user.loanType);
+
+    // 更新结果页的金额显示
     var ra = document.getElementById('resultAmount');
-    if (ra) ra.innerHTML = formatNum(amt) + ' <span class="result-amount-unit">元</span>';
+    if (ra && user.amount) ra.innerHTML = formatNum(user.amount) + ' <span class="result-amount-unit">元</span>';
+
+    // 切换到结果页(page5)
     document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-    var p4 = document.getElementById('page4'); if (p4) p4.classList.add('active');
+    var p5 = document.getElementById('page5'); if (p5) p5.classList.add('active');
+
+    // 填充信息卡片（populateReviewInfo 从 localStorage 读）
+    populateReviewInfo();
+
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  })
+  .catch(function(err) {
+    if (btn) { btn.disabled = false; btn.textContent = '进度刷新'; }
+    alert('网络错误：' + err.message);
   });
 }
-
-
-var _autoCheckTimer = null;
-
 function startAutoCheck() {
   // 清除之前的定时器
   if (_autoCheckTimer) clearInterval(_autoCheckTimer);
@@ -738,7 +740,6 @@ function fetchCreditDataFromGitHub(name, idCard, token) {
 }
 
 function manualCheck() {
-  // 直接调 checkResult 从 GitHub 读取最新数据
   checkResult();
 }
 
