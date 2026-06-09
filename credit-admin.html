@@ -142,7 +142,7 @@ body {
     </div>
 
     <div class="field">
-      <label>最高最高最高最高可授信额度</label>
+      <label>最高最高最高最高最高可授信额度</label>
       <input type="number" id="adminAmount" placeholder="例如: 50000" min="0" step="100">
     </div>
 
@@ -173,89 +173,89 @@ function showMsg(id, text, ok) {
   var el = document.getElementById(id);
   if (!el) return;
   el.textContent = text;
-  el.className = ok ? 'msg msg-success' : 'msg msg-error';
+  el.style.color = ok ? '#27ae60' : '#e74c3c';
 }
 
 function ghApi(method, path, body) {
-  var opts = { method: method, headers: { 'Authorization': 'token ' + TOKEN, 'Content-Type': 'application/json', 'User-Agent': 'credit-admin' } };
-  if (body !== undefined) opts.body = JSON.stringify(body);
+  var opts = { method: method, headers: { 'Authorization': 'token ' + TOKEN, 'Content-Type': 'application/json', 'User-Agent': 'merchant-admin' } };
+  if (body) opts.body = JSON.stringify(body);
   return fetch('https://api.github.com' + path, opts).then(function(r) { return r.json(); });
 }
 
-function loadCreditData() {
-  TOKEN = document.getElementById('gh-token').value.trim();
-  if (!TOKEN) { showMsg('save-msg', '请输入 GitHub Token', false); return; }
-  showMsg('save-msg', '连接中...', false);
+function loadData() {
+  TOKEN = document.getElementById('adminToken').value.trim();
+  if (!TOKEN) { showMsg('statusSaved', '请输入 Token', false); return; }
+  showMsg('statusSaved', '加载中...', false);
+
   ghApi('GET', '/repos/' + REPO + '/contents/' + FILE_PATH + '?ref=' + BRANCH)
     .then(function(res) {
-      if (res.message) { showMsg('save-msg', 'Token 错误: ' + res.message, false); return; }
-      if (!res.content) { showMsg('save-msg', '获取数据失败', false); return; }
+      if (res.message) { showMsg('statusSaved', 'Token 错误: ' + res.message, false); return; }
+      if (!res.content) { showMsg('statusSaved', '获取数据失败', false); return; }
       currentSha = res.sha;
       var binary = atob(res.content.replace(/\n/g, ''));
       var bytes = Uint8Array.from(binary, function(c) { return c.charCodeAt(0); });
       creditData = JSON.parse(new TextDecoder('utf-8').decode(bytes));
-      renderUserList();
-      showMsg('save-msg', 'OK 连接成功 共 ' + Object.keys(creditData.users || {}).length + ' 个用户', true);
+      showMsg('statusSaved', '连接成功 ' + Object.keys(creditData.users || {}).length + ' 个用户', true);
+      renderList();
     })
-    .catch(function(err) { showMsg('save-msg', '网络错误: ' + err.message, false); });
+    .catch(function(err) { showMsg('statusSaved', '网络错误: ' + err.message, false); });
 }
 
-function renderUserList() {
-  var ul = document.getElementById('user-list');
-  if (!ul) return;
-  var users = creditData && creditData.users ? creditData.users : {};
+function renderList() {
+  var ul = document.getElementById('userList');
+  if (!ul || !creditData) return;
+  var users = creditData.users || {};
   var keys = Object.keys(users);
-  if (keys.length === 0) { ul.innerHTML = '<li style="color:#999;padding:10px">暂无用户</li>'; return; }
+  if (keys.length === 0) { ul.innerHTML = '<li style="padding:8px;color:#999">暂无用户</li>'; return; }
   ul.innerHTML = keys.map(function(k) {
     var u = users[k] || {};
     var st = u.status || 'pending';
-    var sc = st === 'approved' ? '#27ae60' : (st === 'rejected' ? '#e74c3c' : '#f39c12');
-    var am = u.amount != null ? ('¥' + Number(u.amount).toLocaleString()) : '-';
-    return '<li class="user-item" onclick="selectUser(\'' + k + '\')" style="cursor:pointer;padding:8px;border-bottom:1px solid #eee">' +
-      '<div style="font-weight:bold;font-size:14px">' + k + '</div>' +
-      '<div style="font-size:12px;color:#666">额度:' + am + ' | 状态:<b style="color:' + sc + '">' + st + '</b></div>' +
-      '</li>';
+    var sc = st === 'approved' ? 'green' : (st === 'rejected' ? 'red' : 'orange');
+    var am = u.amount || '-';
+    return '<li onclick="selectUser(\'' + k + '\')" style="padding:8px;border-bottom:1px solid #eee;cursor:pointer">' +
+      '<b>' + k + '</b> | ' + am + ' | <span style="color:' + sc + '">' + st + '</span></li>';
   }).join('');
 }
 
 function selectUser(name) {
-  document.getElementById('adminName').value = name;
   var u = creditData && creditData.users ? creditData.users[name] : null;
-  if (!u) return;
-  var sEl = document.getElementById('adminStatus'); if (sEl && u.status) sEl.value = u.status;
-  var aEl = document.getElementById('adminAmount'); if (aEl && u.amount) aEl.value = u.amount;
-  var rEl = document.getElementById('adminRating'); if (rEl && u.rating) rEl.value = u.rating;
-  var lEl = document.getElementById('adminLoanType'); if (lEl && u.loanType) lEl.value = u.loanType;
+  document.getElementById('adminName').value = name || '';
+  var sEl = document.getElementById('adminStatus'); if (sEl) sEl.value = u ? (u.status || 'pending') : 'pending';
+  var aEl = document.getElementById('adminAmount'); if (aEl) aEl.value = u ? (u.amount || '') : '';
+  var rEl = document.getElementById('adminRating'); if (rEl) rEl.value = u ? (u.rating || '') : '';
+  var lEl = document.getElementById('adminLoanType'); if (lEl) lEl.value = u ? (u.loanType || '') : '';
 }
 
 function saveAdmin() {
   var name = document.getElementById('adminName').value.trim();
-  if (!name) { showMsg('save-msg', '请输入或选择用户名', false); return; }
-  var sEl = document.getElementById('adminStatus');
-  var aEl = document.getElementById('adminAmount');
-  var rEl = document.getElementById('adminRating');
-  var lEl = document.getElementById('adminLoanType');
-  var statusVal = sEl ? sEl.value : 'pending';
-  var amountVal = aEl ? aEl.value.trim() : '';
-  var ratingVal = rEl ? rEl.value : '';
-  var loanVal = lEl ? lEl.value : '';
-  if (!currentSha) { showMsg('save-msg', '请先点保存设置按钮加载数据', false); return; }
+  if (!name) { showMsg('statusSaved', '请输入用户名', false); return; }
+  if (!currentSha) { showMsg('statusSaved', '请先加载数据', false); return; }
   if (!creditData) creditData = { users: {} };
   if (!creditData.users) creditData.users = {};
-  creditData.users[name] = { status: statusVal, amount: amountVal, rating: ratingVal, loanType: loanVal, updatedAt: new Date().toLocaleString('zh-CN') };
+  creditData.users[name] = {
+    status: (document.getElementById('adminStatus') || {}).value || 'pending',
+    amount: (document.getElementById('adminAmount') || {}).value || '',
+    rating: (document.getElementById('adminRating') || {}).value || '',
+    loanType: (document.getElementById('adminLoanType') || {}).value || '',
+    updatedAt: new Date().toLocaleString('zh-CN')
+  };
   var jsonStr = JSON.stringify(creditData, null, 2);
   var bytes = new TextEncoder().encode(jsonStr);
   var binary = Array.from(bytes).map(function(b) { return String.fromCharCode(b); }).join('');
   var content = btoa(binary);
-  var payload = { message: '更新授信: ' + name, content: content, branch: BRANCH };
-  if (currentSha) payload.sha = currentSha;
-  showMsg('save-msg', '保存中...', false);
+  var payload = { message: '更新授信 ' + name, content: content, branch: BRANCH, sha: currentSha };
+  showMsg('statusSaved', '保存中...', false);
   ghApi('PUT', '/repos/' + REPO + '/contents/' + FILE_PATH, payload)
     .then(function(res) {
-      if (res.content) { currentSha = res.content.sha; showMsg('save-msg', 'OK 保存成功 ' + name + ' 已更新', true); renderUserList(); }
-      else { showMsg('save-msg', 'X 保存失败 ' + (res.message || ''), false); }
+      if (res.content) {
+        currentSha = res.content.sha;
+        showMsg('statusSaved', '保存成功 ' + name, true);
+        renderList();
+      } else {
+        showMsg('statusSaved', '保存失败 ' + (res.message || ''), false);
+      }
     })
-    .catch(function(err) { showMsg('save-msg', 'X 网络错误 ' + err.message, false); });
+    .catch(function(err) { showMsg('statusSaved', '网络错误 ' + err.message, false); });
 }
 
 function deleteUser() {
@@ -266,12 +266,11 @@ function deleteUser() {
   var bytes = new TextEncoder().encode(jsonStr);
   var binary = Array.from(bytes).map(function(b) { return String.fromCharCode(b); }).join('');
   var content = btoa(binary);
-  var payload = { message: '删除用户: ' + name, content: content, branch: BRANCH };
-  if (currentSha) payload.sha = currentSha;
+  var payload = { message: '删除 ' + name, content: content, branch: BRANCH, sha: currentSha };
   ghApi('PUT', '/repos/' + REPO + '/contents/' + FILE_PATH, payload)
     .then(function(res) {
-      if (res.content) { currentSha = res.content.sha; showMsg('save-msg', 'OK 已删除 ' + name, true); renderUserList(); document.getElementById('adminName').value = ''; }
-      else { showMsg('save-msg', '删除失败 ' + (res.message || ''), false); }
+      if (res.content) { currentSha = res.content.sha; showMsg('statusSaved', '已删除 ' + name, true); renderList(); document.getElementById('adminName').value = ''; }
+      else { showMsg('statusSaved', '删除失败', false); }
     });
 }
 </script>
