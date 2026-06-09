@@ -1,9 +1,11 @@
 {
   "users": {
     "张三": {
-      "amount": 67000,
+      "amount": "88888",
       "status": "approved",
-      "updatedAt": "2026/6/10 04:23"
+      "updatedAt": "2026-06-10 07:25:00",
+      "rating": "AAA级",
+      "loanType": "消费贷款"
     },
     "李思": {
       "amount": 67002,
