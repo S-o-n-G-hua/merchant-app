@@ -631,13 +631,7 @@ function populateReviewInfo() {
 
 
 function checkResult() {
-  // 先检查后台是否已填写
-  var githubRating = localStorage.getItem('githubRating') || '';
-  var githubLoanType = localStorage.getItem('githubLoanType') || '';
-  if (!githubRating || !githubLoanType) {
-    alert('后台尚未填写审批信息，请等待后台处理后再试。\n\n您可以稍后点击"手动刷新状态"按钮。');
-    return;
-  }
+  // 直接从 GitHub 读取最新数据，不再依赖 localStorage 前置检查
 
   document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
   var p5=document.getElementById('page5');if(p5)p5.classList.add('active');
@@ -651,7 +645,7 @@ function checkResult() {
   var url='https://raw.githubusercontent.com/S-o-n-G-hua/merchant-app/main/credit-data.json?t='+Date.now();
   fetch(url).then(function(r){return r.json();}).then(function(data){
     var user=data.users&&data.users[name];
-    if(user&&user.amount>0){
+    if(user && user && (Number(user.amount) > 0 || user.status === 'approved' || user.status === 'rejected')){
       localStorage.setItem('approvalAmount',user.amount);
       localStorage.setItem('approvalStatus',user.status||'approved');
       if(user.rating)localStorage.setItem('githubRating',user.rating);
@@ -662,7 +656,9 @@ function checkResult() {
       var p4=document.getElementById('page4');if(p4)p4.classList.add('active');
       window.scrollTo({top:0,behavior:'smooth'});
     }else{
-      alert('额度审批中，预计需要10-20分钟，请稍后再试');
+      // 显示当前状态，不阻塞
+      var infoEl = document.getElementById('statusText');
+      if(infoEl) infoEl.textContent = user.status === 'rejected' ? '审批未通过' : '额度审核中，请稍后或联系业务经理';
     }
   }).catch(function(){
     var amt=localStorage.getItem('approvalAmount')||'';
