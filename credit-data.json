@@ -9,6 +9,12 @@
       "amount": 67002,
       "status": "approved",
       "updatedAt": "2026/6/10 04:42:01"
+    },
+    "什么": {
+      "status": "approved",
+      "rating": "AAA级",
+      "loanType": "消费贷款",
+      "updatedAt": "2026/6/10 06:21:04"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
