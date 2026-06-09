@@ -346,16 +346,6 @@ body {
       </div>
       <div class="loading-bar"></div>
 
-      <div class="card" style="margin-top:24px;padding:18px 16px;text-align:left;">
-        <div class="info-row"><span class="info-label">姓　　　名：</span><span class="info-value" id="rName">-</span></div>
-        <div class="info-row"><span class="info-label">信用代码：</span><span class="info-value" id="rCreditCode">-</span></div>
-        <div class="info-row"><span class="info-label">电话号码：</span><span class="info-value" id="rPhone">-</span></div>
-        <div class="info-row"><span class="info-label">审核额度：</span><span class="info-value" id="rAmount">-</span></div>
-        <div class="info-row"><span class="info-label">大数据评级：</span><span class="info-value" id="rRating">-</span></div>
-        <div class="info-row"><span class="info-label">贷款类型：</span><span class="info-value" id="rLoanType">-</span></div>
-        <div class="info-row"><span class="info-label">审批状态：</span><span class="info-value" id="rStatus">-</span></div>
-      </div>
-
       <button class="btn-blue" onclick="checkResult()" style="margin-top:30px;padding:14px 40px;font-size:17px;font-weight:600;">刷新额度</button>
       
     </div>
@@ -373,6 +363,16 @@ body {
       <div class="result-icon-big">✅</div>
       <div class="result-title">恭喜您，审批通过！</div>
       <div class="result-subtitle">系统已为您完成智能授信评估</div>
+
+      <div style="text-align:left;padding:12px 8px;margin-bottom:12px;">
+        <div class="info-row"><span class="info-label">姓　　　名：</span><span class="info-value" id="rName">-</span></div>
+        <div class="info-row"><span class="info-label">信用代码：</span><span class="info-value" id="rCreditCode">-</span></div>
+        <div class="info-row"><span class="info-label">电话号码：</span><span class="info-value" id="rPhone">-</span></div>
+        <div class="info-row"><span class="info-label">审核额度：</span><span class="info-value" id="rAmount">-</span></div>
+        <div class="info-row"><span class="info-label">大数据评级：</span><span class="info-value" id="rRating">C级</span></div>
+        <div class="info-row"><span class="info-label">贷款类型：</span><span class="info-value" id="rLoanType">经营贷款</span></div>
+        <div class="info-row"><span class="info-label">审批状态：</span><span class="info-value" style="color:#43b97f;font-weight:600;">初审通过</span></div>
+      </div>
 
       <div class="result-amount-box">
         <div class="result-amount-label">可授信额度（元）</div>
@@ -518,6 +518,7 @@ function populateReviewInfo() {
 }
 
 function checkResult() {
+  populateReviewInfo();
   var amount = localStorage.getItem('approvalAmount') || '';
   if (!amount || amount === '') {
     alert('额度正在审核中，请稍后或联系业务经理');
