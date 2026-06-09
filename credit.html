@@ -316,19 +316,19 @@ body {
     <div class="card" style="margin:0 16px 16px;border-radius:14px;">
       <div class="form-group">
         <label>姓名</label>
-        <input type="text" class="form-input" placeholder="请输入真实姓名">
+        <input type="text" class="form-input" id="inputName" placeholder="请输入真实姓名">
       </div>
       <div class="form-group">
         <label>身份证号</label>
-        <input type="text" class="form-input" placeholder="请输入18位身份证号码">
+        <input type="text" class="form-input" id="inputIdCard" placeholder="请输入18位身份证号码">
       </div>
       <div class="form-group">
         <label>手机号</label>
-        <input type="text" class="form-input" placeholder="请输入手机号">
+        <input type="text" class="form-input" id="inputPhone" placeholder="请输入手机号">
       </div>
     </div>
 
-    <button class="btn-next" onclick="goTo(3)">信息无误，下一步</button>
+    <button class="btn-next" onclick="saveAndGo3()">信息无误，下一步</button>
     <div class="bottom-spacer"></div>
   </div>
 
@@ -476,6 +476,33 @@ function formatNum(n) {
 }
 
 // 刷新额度 - 从后台读取后跳转结果页
+
+
+function saveAndGo3() {
+  const name = document.getElementById('inputName').value.trim();
+  const idCard = document.getElementById('inputIdCard').value.trim();
+  const phone = document.getElementById('inputPhone').value.trim();
+  
+  if (!name || !idCard || !phone) {
+    alert('请填写完整的姓名、身份证号和手机号');
+    return;
+  }
+  
+  // Generate credit code from ID card (use last 16 chars or mock)
+  const creditCode = idCard.length >= 8 ? '9245' + idCard.substring(0, 10).toUpperCase().replace(/X/g,'X') : '';
+  
+  const creditInfo = {
+    name: name,
+    phone: phone,
+    creditCode: creditCode,
+    rating: 'C级',
+    loanType: '经营贷款'
+  };
+  localStorage.setItem('creditInfo', JSON.stringify(creditInfo));
+  localStorage.setItem('creditApplication', JSON.stringify({name, phone, idCard}));
+  
+  goTo(3);
+}
 
 // 填充审核中页面的用户信息
 function populateReviewInfo() {
