@@ -11,7 +11,7 @@ body {
   background: #f5f7fa; min-height: 100vh;
   display: flex; justify-content: center; padding: 20px 10px;
 }
-.container { width: 100%; max-width: 480px; }
+.container { width: 100%; max-width: 520px; }
 .header {
   background: linear-gradient(135deg, #ff9800, #f57c00);
   color: #fff; border-radius: 20px 20px 0 0;
@@ -24,7 +24,7 @@ body {
   padding: 28px 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);
   margin-bottom: 20px;
 }
-.field { margin-bottom: 22px; }
+.field { margin-bottom: 18px; }
 .field label {
   display: block; font-size: 14px; font-weight: 600;
   color: #555; margin-bottom: 8px;
@@ -47,40 +47,37 @@ body {
 }
 .btn-save:hover { transform: translateY(-1px); }
 .btn-save:active { transform: scale(0.98); }
-.btn-clear {
-  width: 100%; padding: 13px; border: 1.5px solid #e0e4ea;
-  border-radius: 14px; background: #fff; color: #888;
+.btn-del {
+  width: 100%; padding: 13px; border: 1.5px solid #ffcdd2;
+  border-radius: 14px; background: #fff; color: #e57373;
   font-size: 15px; font-weight: 600; cursor: pointer;
-  margin-top: 12px; transition: all 0.2s;
+  margin-top: 10px; transition: all 0.2s;
 }
-.btn-clear:hover { border-color: #ccc; }
+.btn-del:hover { background: #ffebee; }
 .status-ok {
   text-align: center; font-size: 14px; color: #43b97f;
-  margin-top: 16px; font-weight: 600; display: none;
+  margin-top: 14px; font-weight: 600; display: none;
 }
 .status-ok.show { display: block; }
+
+/* 用户列表 */
+.user-list { margin-bottom: 24px; max-height:300px; overflow-y:auto; }
+.user-item {
+  background: #fff9f0; border-radius: 14px; padding: 16px 18px;
+  margin-bottom: 12px; border: 1px solid #ffe0b2;
+  cursor: pointer; transition: all 0.15s; position:relative;
+}
+.user-item:hover { border-color: #ff9800; background: #fff3e0; }
+.user-item.active { border-color: #ff9800; background: #fff3e0; box-shadow: 0 2px 8px rgba(255,152,0,0.15); }
+.user-item-name { font-size: 16px; font-weight: 700; color: #333; }
+.user-item-detail { font-size: 13px; color: #888; margin-top: 4px; }
+.user-item-amount { font-size: 18px; font-weight: 700; color: #e65100; position:absolute; right:18px; top:16px; }
 
 .preview-link {
   display: block; text-align: center; margin-top: 16px;
   font-size: 13px; color: #ff9800; text-decoration: none;
 }
 .preview-link:hover { text-decoration: underline; }
-
-/* 当前设置展示 */
-.current-settings {
-  background: #fff9f0; border-radius: 14px; padding: 20px;
-  margin-bottom: 24px; border: 1px solid #ffe0b2;
-}
-.current-settings h3 { font-size: 15px; color: #e65100; margin-bottom: 12px; }
-.setting-row {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 8px 0; border-bottom: 1px solid #fff3e0;
-}
-.setting-row:last-child { border-bottom: none; }
-.setting-key { font-size: 13px; color: #888; }
-.setting-val { font-size: 15px; font-weight: 700; color: #333; }
-.setting-val.approved { color: #43b97f; }
-.setting-val.rejected { color: #e57373; }
 </style>
 </head>
 <body>
@@ -88,27 +85,25 @@ body {
 <div class="container">
   <div class="header">
     <h1>🔧 授信管理</h1>
-    <p>设置用户端审批结果，修改后实时生效</p>
+    <p>按用户设置审批额度，修改后实时生效</p>
   </div>
 
   <div class="card">
-    <!-- 当前设置 -->
-    <div class="current-settings" id="currentSettings">
-      <h3>📋 当前设置</h3>
-      <div class="setting-row">
-        <span class="setting-key">审批状态</span>
-        <span class="setting-val" id="curStatus">加载中...</span>
-      </div>
-      <div class="setting-row">
-        <span class="setting-key">审批额度</span>
-        <span class="setting-val" id="curAmount">加载中...</span>
-      </div>
+    <!-- 用户列表 -->
+    <div class="user-list" id="userList">
+      <div style="text-align:center;color:#ccc;padding:30px;font-size:14px;">暂无用户数据</div>
+    </div>
+
+    <!-- 编辑区域 -->
+    <div class="field">
+      <label>用户姓名</label>
+      <input type="text" id="adminName" placeholder="请输入用户姓名">
+      <div class="hint">选择上方已有用户，或输入新用户名</div>
     </div>
 
     <div class="field">
       <label>审批额度（元）</label>
-      <input type="number" id="adminAmount" placeholder="例如：300000">
-      <div class="hint">留空则使用默认值 300,000 元</div>
+      <input type="number" id="adminAmount" placeholder="例如：789000">
     </div>
 
     <div class="field">
@@ -120,62 +115,98 @@ body {
     </div>
 
     <button class="btn-save" onclick="saveAdmin()">💾 保存设置</button>
-    <button class="btn-clear" onclick="clearAdmin()">清除设置</button>
+    <button class="btn-del" onclick="deleteUser()">🗑 删除该用户</button>
     <div class="status-ok" id="statusSaved">✅ 已保存，用户端实时生效</div>
 
-    <a class="preview-link" href="index.html" target="_blank">👉 打开用户端页面预览</a>
+    <a class="preview-link" href="credit.html" target="_blank">👉 打开用户端页面预览</a>
   </div>
 </div>
 
 <script>
-// 页面加载时回填
-(function(){
-  loadCurrent();
-  var savedAmount = localStorage.getItem('approvalAmount') || '';
-  var savedStatus = localStorage.getItem('approvalStatus') || 'approved';
-  document.getElementById('adminAmount').value = savedAmount;
-  document.getElementById('adminStatus').value = savedStatus;
-})();
+var currentUser = '';
 
-function loadCurrent() {
-  var status = localStorage.getItem('approvalStatus') || 'approved';
-  var amount = localStorage.getItem('approvalAmount') || '300000';
-  var statusEl = document.getElementById('curStatus');
-  var amountEl = document.getElementById('curAmount');
-  if (status === 'approved') {
-    statusEl.textContent = '✅ 审批通过';
-    statusEl.className = 'setting-val approved';
-  } else {
-    statusEl.textContent = '❌ 审批拒绝';
-    statusEl.className = 'setting-val rejected';
+(function(){ renderUserList(); })();
+
+function getUsers() {
+  var raw = localStorage.getItem('creditUsers') || '{}';
+  try { return JSON.parse(raw); } catch(e) { return {}; }
+}
+
+function saveUsers(data) {
+  localStorage.setItem('creditUsers', JSON.stringify(data));
+}
+
+function escapeHtml(s) {
+  var d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function renderUserList() {
+  var users = getUsers();
+  var keys = Object.keys(users);
+  var container = document.getElementById('userList');
+  
+  if (keys.length === 0) {
+    container.innerHTML = '<div style="text-align:center;color:#ccc;padding:30px;font-size:14px;">暂无用户，请在下方填写后保存</div>';
+    return;
   }
-  amountEl.textContent = parseInt(amount).toLocaleString('zh-CN') + ' 元';
+  
+  var html = '';
+  for (var i = 0; i < keys.length; i++) {
+    var name = keys[i];
+    var u = users[name];
+    var statusText = u.status === 'approved' ? '✅ 通过' : '❌ 拒绝';
+    var amountText = u.amount ? parseInt(u.amount).toLocaleString('zh-CN') + ' 元' : '-';
+    var activeClass = name === currentUser ? ' active' : '';
+    html += '<div class="user-item' + activeClass + '" onclick="selectUser(\'' + name + '\')">';
+    html += '<span class="user-item-name">' + escapeHtml(name) + '</span>';
+    html += '<span class="user-item-amount">' + amountText + '</span>';
+    html += '<div class="user-item-detail">' + statusText + '</div>';
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+
+function selectUser(name) {
+  currentUser = name;
+  var users = getUsers();
+  var u = users[name] || {};
+  document.getElementById('adminName').value = name;
+  document.getElementById('adminAmount').value = u.amount || '';
+  document.getElementById('adminStatus').value = u.status || 'approved';
+  renderUserList();
 }
 
 function saveAdmin() {
+  var name = document.getElementById('adminName').value.trim();
+  if (!name) { alert('请输入用户姓名'); return; }
   var amount = document.getElementById('adminAmount').value.trim();
   var status = document.getElementById('adminStatus').value;
-  if (amount) {
-    localStorage.setItem('approvalAmount', amount);
-  } else {
-    localStorage.removeItem('approvalAmount');
-  }
+  var users = getUsers();
+  users[name] = { amount: amount || '', status: status, updatedAt: new Date().toLocaleString('zh-CN') };
+  saveUsers(users);
+  currentUser = name;
+  if (amount) localStorage.setItem('approvalAmount', amount);
   localStorage.setItem('approvalStatus', status);
-  
-  // 显示成功提示
+  renderUserList();
   var el = document.getElementById('statusSaved');
   el.classList.add('show');
   setTimeout(function(){ el.classList.remove('show'); }, 2000);
-  
-  loadCurrent();
 }
 
-function clearAdmin() {
-  localStorage.removeItem('approvalAmount');
-  localStorage.removeItem('approvalStatus');
+function deleteUser() {
+  var name = document.getElementById('adminName').value.trim();
+  if (!name) { alert('请先选择要删除的用户'); return; }
+  if (!confirm('确定删除用户「' + name + '」？')) return;
+  var users = getUsers();
+  delete users[name];
+  saveUsers(users);
+  currentUser = '';
+  document.getElementById('adminName').value = '';
   document.getElementById('adminAmount').value = '';
   document.getElementById('adminStatus').value = 'approved';
-  loadCurrent();
+  renderUserList();
 }
 </script>
 
