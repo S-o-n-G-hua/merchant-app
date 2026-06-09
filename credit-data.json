@@ -8,7 +8,7 @@
     "李思": {
       "amount": 67000,
       "status": "approved",
-      "updatedAt": "2026/6/10 04:22:58"
+      "updatedAt": "2026/6/10 04:22:59"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
