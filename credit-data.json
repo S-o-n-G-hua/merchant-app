@@ -15,6 +15,13 @@
       "rating": "AAA级",
       "loanType": "消费贷款",
       "updatedAt": "2026/6/10 06:23:41"
+    },
+    "什么鬼": {
+      "status": "approved",
+      "amount": "69000",
+      "rating": "AAA级",
+      "loanType": "消费贷款",
+      "updatedAt": "2026/6/10 06:39:40"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
