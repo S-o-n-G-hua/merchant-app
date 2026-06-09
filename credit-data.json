@@ -45,13 +45,6 @@
       "rating": "AA级",
       "loanType": "消费贷款",
       "updatedAt": "2026/6/10 07:11:45"
-    },
-    "__auto_test__": {
-      "status": "approved",
-      "amount": "88888",
-      "rating": "B级",
-      "loanType": "经营贷款",
-      "updatedAt": "auto-test"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
