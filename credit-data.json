@@ -1,9 +1,9 @@
 {
   "users": {
     "张三": {
-      "amount": 56001,
+      "amount": 67000,
       "status": "approved",
-      "updatedAt": "2026-06-10"
+      "updatedAt": "2026/6/10 04:23"
     },
     "李思": {
       "amount": 67000,
