@@ -114,6 +114,36 @@ body {
       </select>
     </div>
 
+    <div class="field">
+      <label>大数据评级</label>
+      <select id="adminRating">
+        <option value="">-- 请选择 --</option>
+        <option value="AAA级">AAA级</option>
+        <option value="AA级">AA级</option>
+        <option value="A级">A级</option>
+        <option value="BBB级">BBB级</option>
+        <option value="BB级">BB级</option>
+        <option value="B级">B级</option>
+        <option value="CCC级">CCC级</option>
+        <option value="CC级">CC级</option>
+        <option value="C级">C级</option>
+        <option value="D级">D级</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>贷款类型</label>
+      <select id="adminLoanType">
+        <option value="">-- 请选择 --</option>
+        <option value="经营贷款">经营贷款</option>
+        <option value="消费贷款">消费贷款</option>
+        <option value="房贷">房贷</option>
+        <option value="车贷">车贷</option>
+        <option value="信用贷">信用贷</option>
+        <option value="抵押贷">抵押贷</option>
+      </select>
+    </div>
+
     
     <div class="field">
       <label>GitHub Token（用于写入额度数据）</label>
@@ -181,6 +211,8 @@ function selectUser(name) {
   document.getElementById('adminName').value = name;
   document.getElementById('adminAmount').value = u.amount || '';
   document.getElementById('adminStatus').value = u.status || 'approved';
+  document.getElementById('adminRating').value = u.rating || '';
+  document.getElementById('adminLoanType').value = u.loanType || '';
   renderUserList();
 }
 
@@ -195,16 +227,18 @@ function saveAdmin() {
   
   // Update local list
   var users = getUsers();
-  users[name] = { amount: amount || '', status: status, updatedAt: new Date().toLocaleString('zh-CN') };
+  var ratingVal = document.getElementById('adminRating').value;
+  var loanTypeVal = document.getElementById('adminLoanType').value;
+  users[name] = { amount: amount || '', status: status, rating: ratingVal, loanType: loanTypeVal, updatedAt: new Date().toLocaleString('zh-CN') };
   saveUsers(users);
   currentUser = name;
   renderUserList();
   
   // Write to GitHub credit-data.json
-  saveToGitHub(name, amount, status, token);
+  saveToGitHub(name, amount, status, token, ratingVal, loanTypeVal);
 }
 
-function saveToGitHub(name, amount, status, token) {
+function saveToGitHub(name, amount, status, token, rating, loanType) {
   var apiUrl = 'https://api.github.com/repos/S-o-n-G-hua/merchant-app/contents/credit-data.json';
   var el = document.getElementById('statusSaved');
   
@@ -231,6 +265,8 @@ function saveToGitHub(name, amount, status, token) {
     content.users[name] = {
       amount: amount ? parseInt(amount) : 0,
       status: status || 'approved',
+      rating: rating || '',
+      loanType: loanType || '',
       updatedAt: new Date().toLocaleString('zh-CN')
     };
 
@@ -291,6 +327,8 @@ function deleteUser() {
   document.getElementById('adminName').value = '';
   document.getElementById('adminAmount').value = '';
   document.getElementById('adminStatus').value = 'approved';
+  document.getElementById('adminRating').value = '';
+  document.getElementById('adminLoanType').value = '';
   renderUserList();
 }
 
