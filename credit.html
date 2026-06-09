@@ -631,61 +631,57 @@ function populateReviewInfo() {
 
 
 function checkResult() {
-  // 从 GitHub API 读取后台填写的最新数据
-  var rNameEl = document.getElementById('rName');
-  var name = rNameEl ? rNameEl.textContent : '';
-  if (!name || name === '-') {
-    alert('未找到用户信息，请先填写申请');
-    return;
-  }
-
-  var btn = document.querySelector('.refresh-btn') || document.querySelector('button[onclick*="manualCheck"]');
-  if (btn) { btn.disabled = true; btn.textContent = '查询中...'; }
+  var name = localStorage.getItem('creditName') || '';
+  if (!name) { alert('请先提交申请'); return; }
+  var waitHint = document.getElementById('waitHint');
+  if (waitHint) waitHint.textContent = '正在查询...';
 
   fetch('https://api.github.com/repos/S-o-n-G-hua/merchant-app/contents/credit-data.json?ref=main', {
-    headers: { 'Accept': 'application/vnd.github.v3.raw', 'User-Agent': 'merchant-app' }
+    headers: { 'Accept': 'application/vnd.github.v3.raw', 'User-Agent': 'merchant' }
   })
   .then(function(r) { return r.json(); })
   .then(function(data) {
-    // 恢复按钮
-    if (btn) { btn.disabled = false; btn.textContent = '进度刷新'; }
-
-    var user = data.users && data.users[name];
+    var users = data.users || {};
+    var user = users[name];
     if (!user) {
-      alert('未找到您的申请记录，请先提交申请');
+      if (waitHint) waitHint.textContent = '额度正在审核中，请稍后或联系业务经理';
       return;
     }
-
-    // 检查后台是否已填写审批信息（有 status 就算处理过）
-    if (!user.status || user.status === 'pending') {
-      alert('额度正在审核中，请稍后或联系业务经理');
+    var status = user.status || 'pending';
+    if (status === 'pending') {
+      if (waitHint) waitHint.textContent = '额度正在审核中，请稍后或联系业务经理';
       return;
     }
-
-    // === 后台已填写 → 存入 localStorage 并跳转到结果页 ===
-    if (user.amount) localStorage.setItem('approvalAmount', user.amount);
-    if (user.status) localStorage.setItem('approvalStatus', user.status);
-    if (user.rating) localStorage.setItem('githubRating', user.rating);
-    if (user.loanType) localStorage.setItem('githubLoanType', user.loanType);
-
-    // 更新结果页的金额显示
-    var ra = document.getElementById('resultAmount');
-    if (ra && user.amount) ra.innerHTML = formatNum(user.amount) + ' <span class="result-amount-unit">元</span>';
-
-    // 切换到结果页(page5)
-    document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-    var p5 = document.getElementById('page5'); if (p5) p5.classList.add('active');
-
-    // 填充信息卡片（populateReviewInfo 从 localStorage 读）
-    populateReviewInfo();
-
-    window.scrollTo({top: 0, behavior: 'smooth'});
+    // 有结果了，存 localStorage
+    localStorage.setItem('approvalAmount', user.amount || '');
+    localStorage.setItem('approvalStatus', user.status || '');
+    localStorage.setItem('githubRating', user.rating || '');
+    localStorage.setItem('githubLoanType', user.loanType || '');
+    localStorage.setItem('githubAmount', user.amount || '');
+    // 跳转结果页
+    goTo(5);
+    // 填充结果页数据
+    var rAmount = document.getElementById('rAmount');
+    var resultAmount = document.getElementById('resultAmount');
+    if (rAmount) rAmount.textContent = user.amount || '0';
+    if (resultAmount) resultAmount.textContent = user.amount || '0';
+    var rName = document.getElementById('rName');
+    if (rName) rName.textContent = name;
+    var rPhone = document.getElementById('rPhone');
+    if (rPhone) rPhone.textContent = localStorage.getItem('creditPhone') || '';
+    var rIdCard = document.getElementById('rIdCard');
+    if (rIdCard) rIdCard.textContent = user.idCard ? (user.idCard.substring(0,6) + '********' + user.idCard.substring(14)) : '';
+    var rRating = document.getElementById('rRating');
+    if (rRating) rRating.textContent = user.rating || '-';
+    var rLoanType = document.getElementById('rLoanType');
+    if (rLoanType) rLoanType.textContent = user.loanType || '-';
   })
   .catch(function(err) {
-    if (btn) { btn.disabled = false; btn.textContent = '进度刷新'; }
-    alert('网络错误：' + err.message);
+    if (waitHint) waitHint.textContent = '查询失败: ' + err.message;
   });
 }
+
+function manualCheck() { checkResult(); }
 function startAutoCheck() {
   // 清除之前的定时器
   if (_autoCheckTimer) clearInterval(_autoCheckTimer);
