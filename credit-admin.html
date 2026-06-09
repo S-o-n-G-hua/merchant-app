@@ -142,7 +142,7 @@ body {
     </div>
 
     <div class="field">
-      <label>最高可授信额度</label>
+      <label>最高最高可授信额度</label>
       <input type="number" id="adminAmount" placeholder="例如: 50000" min="0" step="100">
     </div>
 
@@ -162,185 +162,200 @@ body {
 
 
 <script>
-  // ====== 全局变量 ======
-  var GITHUB_TOKEN = '';
-  var REPO = 'S-o-n-G-hua/merchant-app';
-  var BRANCH = 'main';
-  var FILE_PATH = 'credit-data.json';
-  var currentSha = '';
-  var currentUser = '';
+// ============================================================
+// 授信管理后台 — 完全照搬 admin.html 的 ghApi + currentSha 模式
+// ============================================================
 
-  // ====== ghApi 封装 (与 admin.html 完全一致) ======
-  function ghApi(method, path, body) {
-    var opts = {
-      method: method,
-      headers: {
-        'Authorization': 'token ' + GITHUB_TOKEN,
-        'Content-Type': 'application/json',
-        'User-Agent': 'merchant-admin'
+var TOKEN = '';
+var REPO = 'S-o-n-G-hua/merchant-app';
+var BRANCH = 'main';
+var FILE_PATH = 'credit-data.json';
+var currentSha = '';
+var creditData = null;
+
+function showMsg(id, text, ok) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  el.className = ok ? 'msg msg-success' : 'msg msg-error';
+}
+
+function ghApi(method, path, body) {
+  var opts = {
+    method: method,
+    headers: {
+      'Authorization': 'token ' + TOKEN,
+      'Content-Type': 'application/json',
+      'User-Agent': 'credit-admin'
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  return fetch('https://api.github.com' + path, opts).then(function(r) { return r.json(); });
+}
+
+// 加载数据（连接按钮触发）
+function loadCreditData() {
+  TOKEN = document.getElementById('gh-token').value.trim();
+  if (!TOKEN) { showMsg('save-msg', '请输入 GitHub Token', false); return; }
+
+  showMsg('save-msg', '连接中...', false);
+
+  ghApi('GET', '/repos/' + REPO + '/contents/' + FILE_PATH + '?ref=' + BRANCH)
+    .then(function(res) {
+      if (res.message) {
+        showMsg('save-msg', 'Token错误: ' + res.message, false);
+        return;
       }
-    };
-    if (body) opts.body = JSON.stringify(body);
-    return fetch('https://api.github.com' + path, opts).then(function(r) { return r.json(); });
-  }
+      if (!res.content) {
+        showMsg('save-msg', '获取数据失败', false);
+        return;
+      }
 
-  // ====== 本地存储 ======
-  function getUsers() {
-    try { return JSON.parse(localStorage.getItem('creditUsers') || '{}'); } catch(e) { return {}; }
-  }
-  function saveUsers(u) { localStorage.setItem('creditUsers', JSON.stringify(u)); }
+      // 关键：更新 SHA
+      currentSha = res.sha;
 
-  // ====== 从 GitHub 加载数据到本地列表 ======
-  function loadFromGitHub() {
-    if (!GITHUB_TOKEN) { showStatus('请先填写 Token', false); return; }
-    showStatus('正在加载...', true);
-    ghApi('GET', '/repos/' + REPO + '/contents/' + FILE_PATH + '?ref=' + BRANCH)
-      .then(function(res) {
-        if (res.message) { showStatus('加载失败: ' + res.message, false); return; }
-        currentSha = res.sha;
-        var binary = atob(res.content.replace(/\n/g, ''));
-        var bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
-        var decoded = new TextDecoder('utf-8').decode(bytes);
-        var data = JSON.parse(decoded);
-        if (data.users) saveUsers(data.users);
-        renderUserList();
-        showStatus('已从 GitHub 加载 (' + Object.keys(data.users || {}).length + ' 用户)', true);
-      })
-      .catch(function(err) { showStatus('网络错误: ' + err.message, false); });
-  }
+      // 解码内容
+      var binary = atob(res.content.replace(/\n/g, ''));
+      var bytes = Uint8Array.from(binary, function(c) { return c.charCodeAt(0); });
+      var decoded = new TextDecoder('utf-8').decode(bytes);
+      creditData = JSON.parse(decoded);
 
-  // ====== 保存到 GitHub (带 currentSha，解决 409) ======
-  function saveToGitHub(name, status, token, rating, loanType, amount) {
-    GITHUB_TOKEN = token;
-    showStatus('保存中...', true);
-
-    // Step 1: GET 最新 SHA
-    ghApi('GET', '/repos/' + REPO + '/contents/' + FILE_PATH + '?ref=' + BRANCH)
-      .then(function(res) {
-        if (!res.sha) throw new Error('GET failed: ' + (res.message || 'unknown'));
-        currentSha = res.sha;
-
-        // 解码现有数据
-        var content;
-        try {
-          var raw = atob(res.content.replace(/\n/g, ''));
-          var bytes = Uint8Array.from(raw, c => c.charCodeAt(0));
-          content = JSON.parse(new TextDecoder('utf-8').decode(bytes));
-        } catch(e) { content = { users: {}, note: '' }; }
-        if (!content.users) content.users = {};
-
-        // 更新用户数据
-        content.users[name] = {
-          status: status || 'approved',
-          amount: amount || '',
-          rating: rating || '',
-          loanType: loanType || '',
-          updatedAt: new Date().toLocaleString('zh-CN')
-        };
-
-        // 编码
-        var jsonStr = JSON.stringify(content, null, 2);
-        var enc = new TextEncoder().encode(jsonStr);
-        var binary = Array.from(enc).map(function(b){return String.fromCharCode(b)}).join('');
-        var b64content = btoa(binary);
-
-        // Step 2: PUT (带最新 SHA)
-        return ghApi('PUT', '/repos/' + REPO + '/contents/' + FILE_PATH, {
-          message: 'update: 授信 ' + name + ' -> ' + status,
-          content: b64content,
-          sha: currentSha,
-          branch: BRANCH
-        });
-      })
-      .then(function(res) {
-        if (res.content) {
-          currentSha = res.content.sha; // 更新 SHA！
-          showStatus('✅ 已保存到 GitHub，用户端可刷新查看', true);
-        } else {
-          showStatus('❌ 保存失败: ' + (res.message || 'unknown'), false);
-        }
-      })
-      .catch(function(err) { showStatus('❌ 错误: ' + err.message, false); });
-  }
-
-  // ====== UI 函数 ======
-  function showStatus(msg, ok) {
-    var el = document.getElementById('statusSaved');
-    if (!el) return;
-    el.textContent = msg;
-    el.style.color = ok ? '#10b981' : '#ef4444';
-    el.classList.add('show');
-    setTimeout(function(){ el.classList.remove('show'); }, 5000);
-  }
-
-  function selectUser(name) {
-    currentUser = name;
-    var users = getUsers();
-    var u = users[name] || {};
-    document.getElementById('adminName').value = name;
-    document.getElementById('adminStatus').value = u.status || 'approved';
-    document.getElementById('adminRating').value = u.rating || '';
-    document.getElementById('adminLoanType').value = u.loanType || '';
-    document.getElementById('adminAmount').value = u.amount || '';
-    renderUserList();
-  }
-
-  function renderUserList() {
-    var ul = document.getElementById('userList');
-    if (!ul) return;
-    var users = getUsers();
-    var names = Object.keys(users).sort();
-    ul.innerHTML = '';
-    if (names.length === 0) { ul.innerHTML = '<li class="empty">暂无用户</li>'; return; }
-    names.forEach(function(n) {
-      var u = users[n];
-      var li = document.createElement('li');
-      li.className = (n === currentUser) ? 'active' : '';
-      var statusIcon = (u.status === 'approved') ? '✅' : (u.status === 'rejected') ? '❌' : '⏳';
-      li.innerHTML = '<strong>' + n + '</strong> <span class="status">' + statusIcon + ' ' + (u.status||'') + '</span>' +
-                     (u.amount ? ' <span class="amt">¥' + u.amount + '</span>' : '') +
-                     (u.rating ? ' <span class="rating">' + u.rating + '</span>' : '');
-      li.onclick = function() { selectUser(n); };
-      ul.appendChild(li);
+      renderUserList();
+      showMsg('save-msg', '✅ 连接成功！共 ' + Object.keys(creditData.users || {}).length + ' 个用户', true);
+    })
+    .catch(function(err) {
+      showMsg('save-msg', '网络错误: ' + err.message, false);
     });
+}
+
+// 渲染用户列表
+function renderUserList() {
+  var ul = document.getElementById('user-list');
+  if (!ul) return;
+  var users = creditData.users || {};
+  var keys = Object.keys(users);
+
+  if (keys.length === 0) {
+    ul.innerHTML = '<li class="user-item" style="color:#999">暂无用户数据</li>';
+    return;
   }
 
-  function deleteUser() {
-    var name = document.getElementById('adminName').value.trim();
-    if (!name) { alert('请输入用户名'); return; }
-    if (!confirm('确定删除用户 ' + name + ' ？')) return;
-    var users = getUsers();
-    delete users[name];
-    saveUsers(users);
-    if (currentUser === name) currentUser = '';
-    document.getElementById('adminName').value = '';
-    renderUserList();
+  ul.innerHTML = keys.map(function(k) {
+    var u = users[k];
+    var statusText = u.status || 'pending';
+    var statusColor = statusText === 'approved' ? '#27ae60' : (statusText === 'rejected' ? '#e74c3c' : '#f39c12');
+    var amountText = u.amount ? ('¥' + Number(u.amount).toLocaleString()) : '-';
+    return '<li class="user-item" onclick="selectUser(\'' + k + '\')">' +
+      '<div class="user-item-name">' + k + '</div>' +
+      '<div class="user-item-amount">额度: ' + amountText + '</div>' +
+      '<div class="user-item-status" style="color:' + statusColor + '">' + statusText + '</div>' +
+      '</li>';
+  }).join('');
+}
+
+// 选择用户
+function selectUser(name) {
+  document.getElementById('adminName').value = name;
+  var u = creditData.users[name];
+  if (u) {
+    document.getElementById('adminStatus').value = u.status || 'pending';
+    var amtEl = document.getElementById('adminAmount');
+    if (amtEl) amtEl.value = u.amount || '';
+    var ratingEl = document.getElementById('adminRating');
+    if (ratingEl && u.rating) ratingEl.value = u.rating;
+    var loanEl = document.getElementById('adminLoanType');
+    if (loanEl && u.loanType) loanEl.value = u.loanType;
+  }
+}
+
+// 保存设置（核心函数，完全照搬 saveBalance）
+function saveAdmin() {
+  var name = document.getElementById('adminName').value.trim();
+  if (!name) { showMsg('save-msg', '请输入或选择用户名', false); return; }
+
+  var statusVal = document.getElementById('adminStatus').value;
+  var amtEl = document.getElementById('adminAmount');
+  var amountVal = amtEl ? amtEl.value.trim() : '';
+  var ratingEl = document.getElementById('adminRating');
+  var ratingVal = ratingEl ? ratingEl.value : '';
+  var loanEl = document.getElementById('adminLoanType');
+  var loanTypeVal = loanEl ? loanEl.value : '';
+
+  if (!currentSha) {
+    showMsg('save-msg', '请先点击「连接并加载」获取最新数据', false);
+    return;
   }
 
-  function saveAdmin() {
-    var name = document.getElementById('adminName').value.trim();
-    if (!name) { alert('请输入用户姓名'); return; }
-    var status = document.getElementById('adminStatus').value;
-    var token = document.getElementById('adminToken').value.trim();
-    if (!token) { alert('请先填写 GitHub Token'); return; }
+  // 初始化数据结构
+  if (!creditData) creditData = { users: {}, note: '用户额度数据' };
+  if (!creditData.users) creditData.users = {};
 
-    var ratingVal = document.getElementById('adminRating').value;
-    var loanTypeVal = document.getElementById('adminLoanType').value;
-    var amountVal = document.getElementById('adminAmount') ? document.getElementById('adminAmount').value : '';
+  // 更新用户数据
+  creditData.users[name] = {
+    status: statusVal,
+    amount: amountVal,
+    rating: ratingVal,
+    loanType: loanTypeVal,
+    updatedAt: new Date().toLocaleString('zh-CN')
+  };
 
-    // 更新本地列表
-    var users = getUsers();
-    users[name] = { amount: amountVal || '', status: status, rating: ratingVal, loanType: loanTypeVal, updatedAt: new Date().toLocaleString('zh-CN') };
-    saveUsers(users);
-    currentUser = name;
-    renderUserList();
+  // 编码（与 admin.html 完全一致的方式）
+  var jsonStr = JSON.stringify(creditData, null, 2);
+  var bytes = new TextEncoder().encode(jsonStr);
+  var binary = Array.from(bytes).map(function(b) { return String.fromCharCode(b); }).join('');
+  var content = btoa(binary);
 
-    // 写入 GitHub
-    saveToGitHub(name, status, token, ratingVal, loanTypeVal, amountVal);
-  }
+  // 构造 payload（必须带 currentSha！）
+  var payload = {
+    message: '更新授信: ' + name + ' -> ' + statusVal + (amountVal ? ' ¥'+amountVal : ''),
+    content: content,
+    sha: currentSha,   // ← 关键！每次 PUT 必须带最新的 SHA
+    branch: BRANCH
+  };
 
-  // 初始化
-  renderUserList();
+  showMsg('save-msg', '保存中...', false);
+
+  ghApi('PUT', '/repos/' + REPO + '/contents/' + FILE_PATH, payload)
+    .then(function(res) {
+      if (res.content) {
+        // 成功后立即更新 SHA（关键！下次 PUT 要用新 SHA）
+        currentSha = res.content.sha;
+        showMsg('save-msg', '✅ 保存成功！' + name + ' 已更新', true);
+        renderUserList();
+      } else {
+        showMsg('save-msg', '❌ 保存失败: ' + (res.message || '未知错误'), false);
+      }
+    })
+    .catch(function(err) {
+      showMsg('save-msg', '❌ 网络错误: ' + err.message, false);
+    });
+}
+
+// 删除用户
+function deleteUser() {
+  var name = document.getElementById('adminName').value.trim();
+  if (!name || !creditData || !creditData.users[name]) return;
+  delete creditData.users[name];
+
+  var jsonStr = JSON.stringify(creditData, null, 2);
+  var bytes = new TextEncoder().encode(jsonStr);
+  var binary = Array.from(bytes).map(function(b) { return String.fromCharCode(b); }).join('');
+  var content = btoa(binary);
+
+  var payload = { message: '删除用户: ' + name, content: content, sha: currentSha, branch: BRANCH };
+
+  ghApi('PUT', '/repos/' + REPO + '/contents/' + FILE_PATH, payload)
+    .then(function(res) {
+      if (res.content) {
+        currentSha = res.content.sha;
+        showMsg('save-msg', '✅ 已删除 ' + name, true);
+        renderUserList();
+        document.getElementById('adminName').value = '';
+      } else {
+        showMsg('save-msg', '删除失败: ' + (res.message || ''), false);
+      }
+    });
+}
 </script>
 
 </body>
