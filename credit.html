@@ -304,7 +304,16 @@ body {
 
     
 
-    <div class="card" style="margin:0 16px 16px;border-radius:14px;">
+    <div class="card" style="margin:0 16px 12px;border-radius:14px;">
+      <div class="upload-area" onclick="handleUpload(this, '人像面')">
+        <div class="upload-text" style="font-size:15px;font-weight:600;color:#43b97f;">人像面</div>
+      </div>
+      <div class="upload-area" onclick="handleUpload(this, '国徽面')">
+        <div class="upload-text" style="font-size:15px;font-weight:600;color:#43b97f;">国徽面</div>
+      </div>
+    </div>
+
+      <div class="card" style="margin:0 16px 16px;border-radius:14px;">
       <div class="form-group">
         <label>姓名</label>
         <input type="text" class="form-input" id="inputName" placeholder="请输入真实姓名">
@@ -505,7 +514,8 @@ body {
 // 上传区域点击处理
 function handleUpload(el, type) {
   el.style.borderColor = '#43b97f';
-  el.innerHTML = '<div style="font-size:42px;margin-bottom:8px">✅</div><div style="font-size:14px;color:#43b97f;font-weight:600">已上传' + type + '</div>';
+  el.style.background = '#f0faf4';
+  el.innerHTML = '<div style="font-size:15px;font-weight:600;color:#43b97f;">✅ 已上传' + type + '</div>';
 }
 
 // 页面跳转
