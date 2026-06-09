@@ -541,16 +541,14 @@ function saveAndGo3() {
   }
   
   // Generate credit code from ID card (use last 16 chars or mock)
-  const creditCode = idCard.length >= 8 ? '9245' + idCard.substring(0, 10).toUpperCase().replace(/X/g,'X') : '';
-  
-  const creditInfo = {
+  var creditInfo = {
     name: name,
     phone: phone,
-    creditCode: creditCode,
-    rating: 'C级',
-    loanType: '经营贷款'
+    idCard: idCard,
+    rating: '',
+    loanType: ''
   };
-  localStorage.setItem('creditInfo', JSON.stringify(creditInfo));
+    localStorage.setItem('creditInfo', JSON.stringify(creditInfo));
   localStorage.setItem('creditApplication', JSON.stringify({name: name, phone: phone, idCard: idCard}));
   
   goTo(3);
