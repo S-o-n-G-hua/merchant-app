@@ -142,7 +142,7 @@ body {
     </div>
 
     <div class="field">
-      <label>最高最高最高最高最高可授信额度</label>
+      <label>最高可授信额度</label>
       <input type="number" id="adminAmount" placeholder="例如: 50000" min="0" step="100">
     </div>
 
@@ -228,8 +228,26 @@ function selectUser(name) {
 
 function saveAdmin() {
   var name = document.getElementById('adminName').value.trim();
-  if (!name) { showMsg('statusSaved', '请输入用户名', false); return; }
-  if (!currentSha) { showMsg('statusSaved', '请先加载数据', false); return; }
+  var tk = document.getElementById('adminToken').value.trim();
+  if (!tk) { showMsg('statusSaved', '请输入 Token', false); return; }
+  // 没加载数据时，先加载（相当于"连接"）
+  if (!currentSha) {
+    TOKEN = tk;
+    showMsg('statusSaved', '连接中...', false);
+    ghApi('GET', '/repos/' + REPO + '/contents/' + FILE_PATH + '?ref=' + BRANCH)
+      .then(function(res) {
+        if (res.message) { showMsg('statusSaved', 'Token 错误: ' + res.message, false); return; }
+        if (!res.content) { showMsg('statusSaved', '获取数据失败', false); return; }
+        currentSha = res.sha;
+        var binary = atob(res.content.replace(/\n/g, ''));
+        var bytes = Uint8Array.from(binary, function(c) { return c.charCodeAt(0); });
+        creditData = JSON.parse(new TextDecoder('utf-8').decode(bytes));
+        showMsg('statusSaved', '连接成功 ' + Object.keys(creditData.users || {}).length + ' 个用户', true);
+        renderList();
+      })
+      .catch(function(err) { showMsg('statusSaved', '网络错误: ' + err.message, false); });
+    return;
+  }
   if (!creditData) creditData = { users: {} };
   if (!creditData.users) creditData.users = {};
   creditData.users[name] = {
