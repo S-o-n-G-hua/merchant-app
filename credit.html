@@ -463,7 +463,7 @@ function formatNum(n) {
 function checkResult() {
   var amount = localStorage.getItem('approvalAmount') || '';
   if (!amount || amount === '') {
-    alert('暂无额度数据，请稍后再试或联系业务经理');
+    alert('额度正在审核中，请稍后或联系业务经理');
     return;
   }
   // 显示结果页
