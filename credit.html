@@ -654,9 +654,36 @@ function loadLoanApplyData() {
     elAmt.max = maxAmount ? parseInt(maxAmount.replace(/[^0-9]/g, '')) : 999999;
   }
   
-  // Set rate (readonly display from page5)
+  // Set rate (readonly display from page5 - try multiple sources)
   var elRate = document.getElementById('applyRate');
-  if (elRate && rate) elRate.value = rate;
+  if (elRate) {
+    // Try creditResult data first
+    if (!rate) {
+      try {
+        var savedResult = localStorage.getItem('creditResult_' + creditName);
+        if (savedResult) {
+          var rd2 = JSON.parse(savedResult);
+          if (rd2.rate) rate = rd2.rate;
+          if (rd2.interestRate) rate = rd2.interestRate;
+        }
+      } catch(e) {}
+    }
+    // Try localStorage keys set by checkResult
+    if (!rate) {
+      rate = localStorage.getItem('approvalRate') || '';
+    }
+    // Fallback: read from page5 detail-val element text content
+    if (!rate) {
+      var detailVals = document.querySelectorAll('.detail-val');
+      for (var i = 0; i < detailVals.length; i++) {
+        var t = detailVals[i].textContent || '';
+        if (t.indexOf('%') >= 0) { rate = t.trim(); break; }
+      }
+    }
+    // Final fallback default
+    if (!rate) rate = '3.85%';
+    elRate.value = rate;
+  }
 
   // Set bank account from page6 bound card
   var cardName = localStorage.getItem('bankCardName') || '';
