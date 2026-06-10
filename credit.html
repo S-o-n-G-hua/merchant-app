@@ -524,13 +524,15 @@ function handleFileSelect(event, type) {
     const key = 'idPhoto_' + type;
     localStorage.setItem(key, e.target.result);
     const imgId = type === '人像面' ? 'previewPerson' : 'previewEmblem';
-    const textId = type === '人像面' ? 'textPerson' : 'textEmblem';
     const img = document.getElementById(imgId);
-    const text = document.getElementById(textId);
+    if (!img) return;
+    const area = img.closest('.upload-area');
+    if (area) {
+      var textDiv = area.querySelector('.upload-text');
+      if (textDiv) textDiv.style.display = 'none';
+    }
     img.src = e.target.result;
     img.style.display = 'block';
-    text.style.display = 'none';
-    text.style.color = '#43b97f';
   };
   reader.readAsDataURL(file);
 }
