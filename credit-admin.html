@@ -270,9 +270,32 @@ function saveAdmin() {
   var bytes = new TextEncoder().encode(jsonStr);
   var binary = Array.from(bytes).map(function(b) { return String.fromCharCode(b); }).join('');
   var content = btoa(binary);
-  var payload = { message: '更新授信 ' + name, content: content, branch: BRANCH, sha: currentSha };
-  showMsg('statusSaved', '保存中...', false);
-  ghApi('PUT', '/repos/' + REPO + '/contents/' + FILE_PATH, payload)
+  // Re-fetch latest SHA before save to avoid 409 conflict
+  showMsg('statusSaved', '获取最新数据...', false);
+  ghApi('GET', '/repos/' + REPO + '/contents/' + FILE_PATH + '?ref=' + BRANCH)
+    .then(function(latest) {
+      if (!latest.sha) { showMsg('statusSaved', '获取SHA失败', false); return; }
+      currentSha = latest.sha;
+      // Re-load creditData to avoid overwriting others' changes
+      if (latest.content) {
+        var bin2 = atob(latest.content.replace(/\n/g, ''));
+        var bt2 = Uint8Array.from(bin2, function(c) { return c.charCodeAt(0); });
+        try { creditData = JSON.parse(new TextDecoder('utf-8').decode(bt2)); } catch(e) {}
+      }
+      var payload = { message: '更新授信 ' + name, content: content, branch: BRANCH, sha: currentSha };
+      showMsg('statusSaved', '保存中...', false);
+      return ghApi('PUT', '/repos/' + REPO + '/contents/' + FILE_PATH, payload);
+    })
+    .then(function(res) {
+      if (!res) return;
+      if (res.content) {
+        currentSha = res.content.sha;
+        showMsg('statusSaved', '保存成功 ' + name, true);
+        renderList();
+      } else {
+        showMsg('statusSaved', '保存失败 ' + (res.message || ''), false);
+      }
+    })
     .then(function(res) {
       if (res.content) {
         currentSha = res.content.sha;
