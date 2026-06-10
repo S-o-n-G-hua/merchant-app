@@ -655,8 +655,15 @@ function loadLoanApplyData() {
   }
   
   // Set rate (readonly display from page5)
+  // Try approvalInterestRate from page5 checkResult storage
+  if (!rate) {
+    rate = localStorage.getItem('approvalInterestRate') || '';
+    if (rate) rate = rate + '%';
+  }
+  // Final fallback default
+  if (!rate) rate = '3.85%';
   var elRate = document.getElementById('applyRate');
-  if (elRate && rate) elRate.value = rate;
+  if (elRate) elRate.value = rate;
 
   // Set bank account from page6 bound card
   var cardName = localStorage.getItem('bankCardName') || '';
@@ -853,6 +860,8 @@ function checkResult() {
     if (rRating) rRating.textContent = user.rating || '-';
     var rLoanType = document.getElementById('rLoanType');
     if (rLoanType) rLoanType.textContent = user.loanType || '-';
+  var p5ir = document.getElementById('page5InterestRate');
+  if (p5ir) { var svIr = localStorage.getItem('approvalInterestRate') || ''; p5ir.textContent = svIr ? (svIr + '%') : '3.85%'; }
   })
   .catch(function(err) {
     if (waitHint) waitHint.textContent = '查询失败: ' + err.message;
