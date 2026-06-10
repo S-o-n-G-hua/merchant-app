@@ -647,11 +647,19 @@ function loadLoanApplyData() {
     }
   } catch(e) {}
 
-  // Set amount input with placeholder hinting at max
+  // Set amount input - enforce max from page5 approval amount
   var elAmt = document.getElementById('applyAmount');
   if (elAmt) {
-    elAmt.placeholder = maxAmount ? '最高可借 ' + maxAmount : '请输入借款金额';
-    elAmt.max = maxAmount ? parseInt(maxAmount.replace(/[^0-9]/g, '')) : 999999;
+    // Priority: githubAmount (set by checkResult from admin data) > savedResult.amount
+    var approvedMax = localStorage.getItem('githubAmount') || maxAmount;
+    if (!approvedMax) approvedMax = '250000';
+    var maxVal = parseInt(approvedMax.replace(/[^0-9]/g, '')) || 250000;
+    elAmt.placeholder = '最高可借 ' + approvedMax;
+    elAmt.max = maxVal;
+    // Enforce limit on input (prevent exceeding approval)
+    elAmt.addEventListener('input', function() {
+      if (this.value && parseInt(this.value) > maxVal) this.value = maxVal;
+    });
   }
   
   // Set rate (readonly display from page5)
