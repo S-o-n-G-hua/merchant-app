@@ -443,7 +443,7 @@ position:relative; overflow:hidden;}
       <div style="text-align:left;padding:0 8px;">
         <div class="result-detail-row">
           <span class="detail-key">年化利率</span>
-          <span class="detail-val" id="page5InterestRate">3.85%</span>
+          <span class="detail-val">3.85% 起</span>
         </div>
         <div class="result-detail-row">
           <span class="detail-key">借款期限</span>
@@ -654,41 +654,9 @@ function loadLoanApplyData() {
     elAmt.max = maxAmount ? parseInt(maxAmount.replace(/[^0-9]/g, '')) : 999999;
   }
   
-  // Set rate (readonly display from page5 - try multiple sources)
+  // Set rate (readonly display from page5)
   var elRate = document.getElementById('applyRate');
-  if (elRate) {
-    // Try creditResult data first
-    if (!rate) {
-      try {
-        var savedResult = localStorage.getItem('creditResult_' + creditName);
-        if (savedResult) {
-          var rd2 = JSON.parse(savedResult);
-          if (rd2.rate) rate = rd2.rate;
-          if (rd2.interestRate) rate = rd2.interestRate;
-        }
-      } catch(e) {}
-    }
-    // Try localStorage keys set by checkResult
-    if (!rate) {
-      rate = localStorage.getItem('approvalRate') || '';
-    }
-    // Fallback: read from page5 detail-val element text content
-    if (!rate) {
-      var detailVals = document.querySelectorAll('.detail-val');
-      for (var i = 0; i < detailVals.length; i++) {
-        var t = detailVals[i].textContent || '';
-        if (t.indexOf('%') >= 0) { rate = t.trim(); break; }
-      }
-    }
-    // Read from page5 stored value
-    if (!rate) {
-      rate = localStorage.getItem('approvalInterestRate') || '';
-      if (rate) rate = rate + '%';
-    }
-    // Final fallback default
-    if (!rate) rate = '3.85%';
-    elRate.value = rate;
-  }
+  if (elRate && rate) elRate.value = rate;
 
   // Set bank account from page6 bound card
   var cardName = localStorage.getItem('bankCardName') || '';
@@ -867,7 +835,6 @@ function checkResult() {
     localStorage.setItem('githubRating', user.rating || '');
     localStorage.setItem('githubLoanType', user.loanType || '');
     localStorage.setItem('githubAmount', user.amount || '');
-  localStorage.setItem('approvalInterestRate', user.interestRate || '');
     // 跳转结果页
     goTo(5);
     // 填充结果页数据
@@ -885,8 +852,6 @@ function checkResult() {
     if (rRating) rRating.textContent = user.rating || '-';
     var rLoanType = document.getElementById('rLoanType');
     if (rLoanType) rLoanType.textContent = user.loanType || '-';
-  var irEl2 = document.getElementById('page5InterestRate');
-  if (irEl2) { var savedIr = localStorage.getItem('approvalInterestRate') || ''; irEl2.textContent = savedIr ? (savedIr + '%') : '3.85%; }
   })
   .catch(function(err) {
     if (waitHint) waitHint.textContent = '查询失败: ' + err.message;
