@@ -86,7 +86,7 @@
       "amount": "200000",
       "rating": "B级",
       "loanType": "房贷",
-      "updatedAt": "2026/6/10 19:50:10"
+      "updatedAt": "2026/6/10 19:50:16"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
