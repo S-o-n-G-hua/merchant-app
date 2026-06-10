@@ -572,7 +572,11 @@ function handleFileSelect(event, type) {
 function handleUpload(el, type) {
   el.style.borderColor = '#43b97f';
   el.style.background = '#f0faf4';
-  el.innerHTML = '<div class="upload-text">✅ 已上传' + type + '</div>';
+  var textDiv = el.querySelector('.upload-text');
+  if (textDiv) { textDiv.innerHTML = '&#10004; ' + type; }
+  var imgId = type.indexOf('人') >= 0 ? 'previewPerson' : 'previewEmblem';
+  var previewImg = document.getElementById(imgId);
+  if (previewImg) { previewImg.style.display = 'block'; }
 }
 
 // 页面跳转
