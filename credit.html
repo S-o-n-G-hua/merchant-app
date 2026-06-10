@@ -304,10 +304,10 @@ body {
     <!-- 身份证照片上传 -->
     <input type="file" accept="image/*" capture="environment" id="filePerson" style="display:none" onchange="handleFileSelect(event,'人像面')">
     <input type="file" accept="image/*" capture="environment" id="fileEmblem" style="display:none" onchange="handleFileSelect(event,'国徽面')">
-    <div class="upload-area" onclick="document.getElementById('filePerson').click()"><img id="previewPerson" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:10px;" />
+    <div class="upload-area" onclick="document.getElementById('filePerson').click()"><img id="previewPerson" style="display:none;width:100%;height:auto;max-height:160px;object-fit:cover;border-radius:10px;" />
         <div class="upload-text" style="font-size:15px;font-weight:600;color:#43b97f;">人像面</div>
       </div>
-      <div class="upload-area" onclick="document.getElementById('fileEmblem').click()"><img id="previewEmblem" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:10px;" />
+      <div class="upload-area" onclick="document.getElementById('fileEmblem').click()"><img id="previewEmblem" style="display:none;width:100%;height:auto;max-height:160px;object-fit:cover;border-radius:10px;" />
         <div class="upload-text" style="font-size:15px;font-weight:600;color:#43b97f;">国徽面</div>
       </div>
     </div>
@@ -414,7 +414,8 @@ body {
       <div class="result-title">恭喜您，审批通过！</div>
       <div class="result-subtitle">系统已为您完成智能授信评估</div>
 
-      <div style="text-align:left;padding:12px 8px;margin-bottom:12px;">
+      <div style="
+      text-align:left;padding:12px 8px;margin-bottom:12px;">
         <div class="info-row"><span class="info-label">姓　　　名：</span><span class="info-value" id="rName">-</span></div>
         <div class="info-row"><span class="info-label">身份证号：</span><span class="info-value" id="rIdCard">-</span></div>
         <div class="info-row"><span class="info-label">电话号码：</span><span class="info-value" id="rPhone">-</span></div>
@@ -432,40 +433,7 @@ body {
 <div class="info-row"><span class="info-label">审批状态：</span><span class="info-value" style="color:#43b97f;font-weight:600;">初审通过</span></div>
       </div>
 
-      <div style="text-align:left;padding:0 8px;">
-        <div class="result-detail-row">
-          <span class="detail-key">年化利率</span>
-          <span class="detail-val">3.85% 起</span>
-        </div>
-        <div class="result-detail-row">
-          <span class="detail-key">借款期限</span>
-          <span class="detail-val">最长 36 期</span>
-        </div>
-        <div class="result-detail-row">
-          <span class="detail-key">还款方式</span>
-          <span class="detail-val">等额本息 / 先息后本</span>
-        </div>
-        <div class="result-detail-row">
-          <span class="detail-key">审批状态</span>
-          <span class="detail-val val-approved">● 已通过</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="card" style="margin:0 16px 16px;text-align:center;padding:20px;">
-      <p style="font-size:13px;color:#999;line-height:1.8;">
-        最终额度、利率、期限及还款方式以实际审批结果为准<br>
-        如有疑问请联系业务经理
-      </p>
-    </div>
-
-    <button class="btn-blue" onclick="goTo(6)">绑卡提款</button>
-    <div class="bottom-spacer"></div>
-  </div>
-
-  <!-- ==================== 第3页（拒绝）：审批结果-拒绝 ==================== -->
-    <!-- ===== 绑卡提款 ===== -->
-  <div class="page" id="page6">
+       id="page6">
     <div class="card" style="margin:0 16px 16px;border-radius:14px;">
       <div style="text-align:center;padding:32px 0 24px;">
         <div style="font-size:48px;margin-bottom:16px;">&#128179;</div>
