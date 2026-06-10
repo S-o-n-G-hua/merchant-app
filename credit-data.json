@@ -1,12 +1,5 @@
 {
   "users": {
-    "做了": {
-      "status": "approved",
-      "amount": "69000",
-      "rating": "AAA级",
-      "loanType": "消费贷款",
-      "updatedAt": "2026/6/10 06:50:37"
-    },
     "双方": {
       "status": "approved",
       "amount": "69000",
