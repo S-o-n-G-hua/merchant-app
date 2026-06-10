@@ -582,6 +582,9 @@ function saveAndGo3() {
   };
     localStorage.setItem('creditInfo', JSON.stringify(creditInfo));
   localStorage.setItem('creditApplication', JSON.stringify({name: name, phone: phone, idCard: idCard}));
+  localStorage.setItem('creditName', name);
+  localStorage.setItem('creditPhone', phone);
+  localStorage.setItem('creditIdCard', idCard);
   
   goTo(3);
 }
