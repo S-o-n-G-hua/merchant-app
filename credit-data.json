@@ -1,12 +1,5 @@
 {
   "users": {
-    "什么鬼": {
-      "status": "approved",
-      "amount": "69000",
-      "rating": "AAA级",
-      "loanType": "消费贷款",
-      "updatedAt": "2026/6/10 06:40:53"
-    },
     "做了": {
       "status": "approved",
       "amount": "69000",
@@ -75,8 +68,8 @@
       "amount": "500000.00",
       "rating": "AAA级",
       "loanType": "公积金贷",
-      "interestRate": "2.1",
-      "updatedAt": "2026/6/11 02:35:28"
+      "interestRate": "2.1%",
+      "updatedAt": "2026/6/11 02:24:18"
     },
     "南宁": {
       "status": "approved",
