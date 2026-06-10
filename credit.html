@@ -222,12 +222,14 @@ position:relative; overflow:hidden;}
 .info-value {color:#333;font-size:14px;font-weight:500;text-align:right;word-break:break-all;}
 
 /* 放款审核进度样式 */
-.review-step{display:flex;align-items:center;padding:12px 8px;border-bottom:1px solid #f5f5f5;}
+.review-step{display:none;align-items:center;padding:12px 8px;border-bottom:1px solid #f5f5f5;}
 .review-step:last-child{border-bottom:none;}
 .rs-dot{width:10px;height:10px;border-radius:50%;background:#ddd;margin-right:12px;flex-shrink:0;transition:background 0.3s;}
 .rs-text{font-size:14px;color:#bbb;transition:color 0.3s;}
+.review-step.active{display:flex;}
 .review-step.active .rs-dot{background:#4a90d9;}
 .review-step.active .rs-text{color:#333;font-weight:500;}
+.review-step.done{display:none;}
 .review-step.done .rs-dot{background:#43b97f;}
 .review-step.done .rs-text{color:#333;}
 </style>
@@ -501,7 +503,7 @@ position:relative; overflow:hidden;}
 
 <div class="page" id="pageLoanReview">
     <div class="card" style="margin:16px;border-radius:14px;text-align:center;padding:40px 24px;">
-      <div style="font-size:56px;margin-bottom:20px;">&#128270;</div>
+      
       <div style="font-size:18px;font-weight:700;color:#333;margin-bottom:24px;">放款审核中</div>
       
       <div id="reviewProgress" style="text-align:left;max-width:280px;margin:0 auto;">
@@ -513,7 +515,7 @@ position:relative; overflow:hidden;}
         <div class="review-step" id="rs6"><span class="rs-dot"></span><span class="rs-text">正在核验流水...</span></div>
       </div>
       
-      <div style="margin-top:28px;font-size:13px;color:#999;" id="reviewTimer">预计等待时间：05:00</div>
+      
     </div>
     <div class="bottom-spacer"></div>
   </div>
@@ -542,49 +544,35 @@ position:relative; overflow:hidden;}
 // 放款审核进度控制（5分钟自动跳转拒绝页）
 var loanReviewTimer = null;
 function startLoanReview() {
-  // Reset all steps
   var steps = document.querySelectorAll('.review-step');
   for (var i = 0; i < steps.length; i++) {
     steps[i].className = 'review-step';
   }
   
-  // Total duration: 5 minutes (300 seconds), 6 steps ~ 50s each
-  var stepDuration = 50; // seconds per step
+  var stepDuration = 50;
   var currentStep = 0;
   
-  // Activate first step immediately
   function activateStep(n) {
     if (n > steps.length) return;
-    // Mark previous as done
     if (n > 1) {
       steps[n-2].className = 'review-step done';
     }
-    // Activate current
     steps[n-1].className = 'review-step active';
   }
   
   activateStep(1);
   
-  // Timer display
   var totalSec = 300;
-  var timerEl = document.getElementById('reviewTimer');
   
   loanReviewTimer = setInterval(function() {
     totalSec--;
     if (totalSec <= 0) {
       clearInterval(loanReviewTimer);
       loanReviewTimer = null;
-      // Auto jump to reject page
       goTo('pageReject');
       return;
     }
     
-    var min = Math.floor(totalSec / 60);
-    var sec = totalSec % 60;
-    timerEl.textContent = '预计等待时间：' + 
-      (min < 10 ? '0' : '') + min + ':' + (sec < 10 ? '0' : '') + sec;
-    
-    // Advance step every stepDuration seconds
     var expectedStep = Math.min(steps.length, Math.floor((300 - totalSec) / stepDuration) + 1);
     if (expectedStep > currentStep && expectedStep <= steps.length) {
       currentStep = expectedStep;
