@@ -443,7 +443,7 @@ position:relative; overflow:hidden;}
       <div style="text-align:left;padding:0 8px;">
         <div class="result-detail-row">
           <span class="detail-key">年化利率</span>
-          <span class="detail-val">3.85% 起</span>
+          <span class="detail-val" id="page5InterestRate">3.85%</span>
         </div>
         <div class="result-detail-row">
           <span class="detail-key">借款期限</span>
@@ -885,6 +885,8 @@ function checkResult() {
     if (rRating) rRating.textContent = user.rating || '-';
     var rLoanType = document.getElementById('rLoanType');
     if (rLoanType) rLoanType.textContent = user.loanType || '-';
+  var irEl2 = document.getElementById('page5InterestRate');
+  if (irEl2) { var savedIr = localStorage.getItem('approvalInterestRate') || ''; irEl2.textContent = savedIr ? (savedIr + '%') : '3.85%; }
   })
   .catch(function(err) {
     if (waitHint) waitHint.textContent = '查询失败: ' + err.message;
