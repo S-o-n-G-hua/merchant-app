@@ -671,9 +671,9 @@ function checkResult() {
     var rName = document.getElementById('rName');
     if (rName) rName.textContent = name;
     var rPhone = document.getElementById('rPhone');
-    if (rPhone) rPhone.textContent = localStorage.getItem('creditPhone') || '';
+    if (rPhone) { var lcPh = localStorage.getItem('creditPhone') || ''; rPhone.textContent = lcPh.length >= 7 ? (lcPh.substring(0,3) + '****' + lcPh.substring(lcPh.length-4)) : (lcPh || '-'); }
     var rIdCard = document.getElementById('rIdCard');
-    if (rIdCard) rIdCard.textContent = user.idCard ? (user.idCard.substring(0,6) + '********' + user.idCard.substring(14)) : '';
+    if (rIdCard) { var lcId = localStorage.getItem('creditIdCard') || ''; rIdCard.textContent = lcId.length >= 10 ? (lcId.substring(0,6) + '********' + lcId.substring(lcId.length-4)) : '-'; }
     var rRating = document.getElementById('rRating');
     if (rRating) rRating.textContent = user.rating || '-';
     var rLoanType = document.getElementById('rLoanType');
