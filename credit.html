@@ -530,7 +530,7 @@ body {
   </div>
 
   <!-- ==================== 第6页：绑卡提款后拒绝 ==================== -->
-  <div class="page" id="page6">
+  <div class="page" id="page7"
     <div class="header-orange" style="padding:32px 28px 36px;">
       <h1 style="font-size:22px;">提款结果</h1>
       <p style="margin-top:6px;">很抱歉，您的提款申请未能通过</p>
@@ -580,7 +580,7 @@ function handleUpload(el, type) {
 }
 
 // 页面跳转
-function goTo(n) {
+function goTo('page7') {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   
   if (n === 4) {
