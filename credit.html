@@ -510,21 +510,19 @@ position:relative;}
 
 <script>
 // 上传区域点击处理
-function handleFileSelect(event, type) {
+function handleFileSelect(event, inputId) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = function(e) {
-    const key = 'idPhoto_' + type;
-    localStorage.setItem(key, e.target.result);
-    const imgId = type === '人像面' ? 'previewPerson' : 'previewEmblem';
-    const textId = type === '人像面' ? 'textPerson' : 'textEmblem';
-    const img = document.getElementById(imgId);
-    const text = document.getElementById(textId);
-    img.src = e.target.result;
-    img.style.display = 'block';
-    text.style.display = 'none';
-    text.style.color = '#43b97f';
+    var isPerson = (inputId === 'filePerson');
+    var imgId = isPerson ? 'previewPerson' : 'previewEmblem';
+    var textId = isPerson ? 'textPerson' : 'textEmblem';
+    localStorage.setItem('idPhoto_' + imgId, e.target.result);
+    var img = document.getElementById(imgId);
+    var txt = document.getElementById(textId);
+    if(img){img.src=e.target.result;img.style.display='block';}
+    if(txt){txt.style.display='none';}
   };
   reader.readAsDataURL(file);
 }
