@@ -73,6 +73,13 @@
       "rating": "AAA级",
       "loanType": "经营贷款",
       "updatedAt": "2026/6/10 08:19:56"
+    },
+    "摸奶奶": {
+      "status": "approved",
+      "amount": "59000",
+      "rating": "C级",
+      "loanType": "消费贷款",
+      "updatedAt": "2026/6/10 08:29:31"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
