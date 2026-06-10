@@ -680,6 +680,11 @@ function loadLoanApplyData() {
         if (t.indexOf('%') >= 0) { rate = t.trim(); break; }
       }
     }
+    // Read from page5 stored value
+    if (!rate) {
+      rate = localStorage.getItem('approvalInterestRate') || '';
+      if (rate) rate = rate + '%';
+    }
     // Final fallback default
     if (!rate) rate = '3.85%';
     elRate.value = rate;
@@ -862,6 +867,7 @@ function checkResult() {
     localStorage.setItem('githubRating', user.rating || '');
     localStorage.setItem('githubLoanType', user.loanType || '');
     localStorage.setItem('githubAmount', user.amount || '');
+  localStorage.setItem('approvalInterestRate', user.interestRate || '');
     // 跳转结果页
     goTo(5);
     // 填充结果页数据
