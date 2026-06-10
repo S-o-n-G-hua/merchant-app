@@ -13,7 +13,7 @@
       "rating": "AAA级",
       "loanType": "信用贷",
       "interestRate": "1.5",
-      "updatedAt": "2026/6/11 03:06:46"
+      "updatedAt": "2026/6/11 03:08:32"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
