@@ -412,9 +412,18 @@ body {
     <div class="card result-card" style="margin:-24px 16px 16px;">
       <div class="result-icon-big"></div>
       <div class="result-title">恭喜您，审批通过！</div>
-      <div class="result-subtitle">系统已为您完成智能授信评估</div>
+      <div class="result-subtitle">系统已为您完成智能授信评估
+      </div>
+
+      <div class="result-amount-box">
+        <div class="result-amount-label">最高可授信额度（元）</div>
+        <div class="result-amount-value" id="resultAmount">
+          300,000 <span class="result-amount-unit">元</span>
+        </div>
+      </div>
 
       <div style="
+      text-align:left;padding:12px 8px;margin-bottom:12px;"><div style="
       text-align:left;padding:12px 8px;margin-bottom:12px;">
         <div class="info-row"><span class="info-label">姓　　　名：</span><span class="info-value" id="rName">-</span></div>
         <div class="info-row"><span class="info-label">身份证号：</span><span class="info-value" id="rIdCard">-</span></div>
