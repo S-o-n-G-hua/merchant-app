@@ -94,15 +94,15 @@
       "rating": "AAA级",
       "loanType": "公积金贷",
       "interestRate": "2.1%",
-      "updatedAt": "2026/6/11 02:23:05"
+      "updatedAt": "2026/6/11 02:24:18"
     },
     "南宁": {
       "status": "approved",
-      "amount": "250000.00",
-      "rating": "AA级",
-      "loanType": "车贷",
-      "interestRate": "2.1%",
-      "updatedAt": "2026/6/11 02:15:59"
+      "amount": "500000.00",
+      "rating": "AAA级",
+      "loanType": "公积金贷",
+      "interestRate": "",
+      "updatedAt": "2026/6/11 02:16:43"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
