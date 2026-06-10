@@ -662,19 +662,19 @@ function loadLoanApplyData() {
     }
   } catch(e) {}
 
-  // Set amount input - enforce max from page5 approval amount
+  // Set amount input - enforce hard limit from page5 approval amount
   var elAmt = document.getElementById('applyAmount');
   if (elAmt) {
     // Priority: githubAmount (set by checkResult from admin data) > savedResult.amount
     var approvedMax = localStorage.getItem('githubAmount') || maxAmount;
     if (!approvedMax) approvedMax = '250000';
-    var maxVal = parseInt(approvedMax.replace(/[^0-9]/g, '')) || 250000;
+    var maxVal = parseFloat(approvedMax.replace(/[^0-9.]/g, '')) || 250000;
     elAmt.placeholder = '最高可借 ' + approvedMax;
     elAmt.max = maxVal;
-    // Enforce limit on input (prevent exceeding approval)
-    elAmt.addEventListener('input', function() {
-      if (this.value && parseInt(this.value) > maxVal) this.value = maxVal;
-    });
+    // Hard enforcement: cap value in real-time on every keystroke
+    elAmt.addEventListener('input', function() { this.value = Math.min(parseFloat(this.value) || 0, maxVal); });
+    elAmt.addEventListener('change', function() { if (parseFloat(this.value) > maxVal) this.value = maxVal; });
+    elAmt.addEventListener('blur', function() { if (parseFloat(this.value) > maxVal) this.value = maxVal; });
   }
   
   // Set rate (readonly display from page5)
