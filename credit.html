@@ -556,7 +556,10 @@ function goTo(n) {
     return;
   }
   
-  document.getElementById('page' + n).classList.add('active');
+  // Support both numeric (goTo(2) -> page2) and string (goTo('pageReject')) targets
+  var targetId = (typeof n === 'number') ? ('page' + n) : n;
+  var el = document.getElementById(targetId);
+  if (el) { el.classList.add('active'); }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
