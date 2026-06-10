@@ -87,6 +87,13 @@
       "rating": "B级",
       "loanType": "房贷",
       "updatedAt": "2026/6/10 19:50:16"
+    },
+    "金轮法王": {
+      "status": "approved",
+      "amount": "500000.00",
+      "rating": "AAA级",
+      "loanType": "公积金贷",
+      "updatedAt": "2026/6/10 22:45:57"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
