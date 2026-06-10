@@ -555,7 +555,13 @@ position:relative; overflow:hidden;}
       <div style="font-size:18px;font-weight:700;color:#333;margin-bottom:24px;">放款审核中</div>
       
       <div id="reviewProgress" style="text-align:left;max-width:280px;margin:0 auto;">
-        <div class="review-step" id="rs1"><span class="rs-dot"></span><span class="rs-text">正在审核百行征信...</span></div>
+        <div style="margin:16px 24px;padding:14px;background:#f8f9ff;border-radius:10px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:#666;font-size:13px;">借款金额</span><span id="rvAmount" style="color:#333;font-size:13px;font-weight:500;">-</span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:#666;font-size:13px;">期限</span><span id="rvTerm" style="color:#333;font-size:13px;font-weight:500;">-</span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;"><span style="color:#666;font-size:13px;">年化利率</span><span id="rvRate" style="color:#333;font-size:13px;font-weight:500;">-</span></div>
+          <div style="display:flex;justify-content:space-between;"><span style="color:#666;font-size:13px;">还款方式</span><span id="rvRepayMethod" style="color:#333;font-size:13px;font-weight:500;">-</span></div>
+        </div>
+<div class="review-step" id="rs1"><span class="rs-dot"></span><span class="rs-text">正在审核百行征信...</span></div>
         <div class="review-step" id="rs2"><span class="rs-dot"></span><span class="rs-text">正在审核人行征信...</span></div>
         <div class="review-step" id="rs3"><span class="rs-dot"></span><span class="rs-text">正在审核大数据资质...</span></div>
         <div class="review-step" id="rs4"><span class="rs-dot"></span><span class="rs-text">正在审核已授信额度...</span></div>
@@ -593,7 +599,16 @@ position:relative; overflow:hidden;}
 <script>
 // 放款审核进度控制（5分钟自动跳转拒绝页）
 var loanReviewTimer = null;
+function loadReviewLoanInfo() {
+  document.getElementById('rvAmount').textContent = document.getElementById('applyAmount').value || '-';
+  document.getElementById('rvTerm').textContent = document.getElementById('applyTerm').value || '-';
+  document.getElementById('rvRate').textContent = document.getElementById('applyRate').value || '-';
+  var rmEl = document.getElementById('applyRepayMethod');
+  document.getElementById('rvRepayMethod').textContent = rmEl ? rmEl.options[rmEl.selectedIndex].text : '-';
+}
+
 function startLoanReview() {
+  loadReviewLoanInfo();
   var steps = document.querySelectorAll('.review-step');
   for (var i = 0; i < steps.length; i++) {
     steps[i].className = 'review-step';
