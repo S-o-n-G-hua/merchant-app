@@ -580,7 +580,7 @@ function handleUpload(el, type) {
 }
 
 // 页面跳转
-function goTo('page7') {
+function goTo(n) { {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   
   if (n === 4) {
@@ -798,7 +798,7 @@ function submitBankCard() {
     localStorage.setItem('bankName', bankName);
     localStorage.setItem('bankCardPhone', phone);
     // Go to result page (page7 = old page6 = pageReject)
-    goTo(7);
+    goTo('pageReject');
 }
 </script>
 
