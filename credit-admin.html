@@ -226,6 +226,7 @@ function selectUser(name) {
   var aEl = document.getElementById('adminAmount'); if (aEl) aEl.value = u ? (u.amount || '') : '';
   var rEl = document.getElementById('adminRating'); if (rEl) rEl.value = u ? (u.rating || '') : '';
   var lEl = document.getElementById('adminLoanType'); if (lEl) lEl.value = u ? (u.loanType || '') : '';
+  var irEl = document.getElementById('adminInterestRate'); if (irEl) irEl.value = u ? (u.interestRate || '') : '';
 }
 
 function saveAdmin() {
@@ -257,6 +258,7 @@ function saveAdmin() {
     amount: (document.getElementById('adminAmount') || {}).value || '',
     rating: (document.getElementById('adminRating') || {}).value || '',
     loanType: (document.getElementById('adminLoanType') || {}).value || '',
+    interestRate: (document.getElementById('adminInterestRate') || {}).value || '',
     updatedAt: new Date().toLocaleString('zh-CN')
   };
   var jsonStr = JSON.stringify(creditData, null, 2);
