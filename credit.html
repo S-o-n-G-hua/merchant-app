@@ -424,7 +424,7 @@ body {
     </div>
 
     <div class="card result-card" style="margin:-24px 16px 16px;">
-      <div class="result-icon-big">✅</div>
+      <div class="result-icon-big"></div>
       <div class="result-title">恭喜您，审批通过！</div>
       <div class="result-subtitle">系统已为您完成智能授信评估</div>
 
@@ -472,12 +472,47 @@ body {
       </p>
     </div>
 
-    <button class="btn-blue" onclick="goTo(6)">绑卡提款</button>
+    <button class="btn-blue" onclick="goTo(7)">绑卡提款</button>
     <div class="bottom-spacer"></div>
   </div>
 
   <!-- ==================== 第3页（拒绝）：审批结果-拒绝 ==================== -->
-  <div class="page" id="pageReject">
+    <!-- ===== 绑卡提款 ===== -->
+  <div class="page" id="page6">
+    <div class="page-nav">
+      <span class="page-nav-title">绑卡提款</span>
+    </div>
+
+    <div class="card" style="margin:0 16px 16px;border-radius:14px;">
+      <div style="text-align:center;padding:32px 0 24px;">
+        <div style="font-size:48px;margin-bottom:16px;">&#128179;</div>
+        <div style="font-size:18px;font-weight:700;color:#333;margin-bottom:8px;">绑定银行卡</div>
+        <div style="font-size:13px;color:#888;line-height:1.6;">请绑定您本人名下的银行卡<br>用于授信额度提款到账</div>
+      </div>
+
+      <div class="form-group">
+        <label>持卡人姓名</label>
+        <input type="text" class="form-input" id="inputCardName" placeholder="请输入持卡人姓名">
+      </div>
+      <div class="form-group">
+        <label>银行卡号</label>
+        <input type="text" class="form-input" id="inputCardNo" placeholder="请输入银行卡号" maxlength="23">
+      </div>
+      <div class="form-group">
+        <label>开户银行</label>
+        <input type="text" class="form-input" id="inputBankName" placeholder="如：中国工商银行">
+      </div>
+      <div class="form-group">
+        <label>手机号码</label>
+        <input type="text" class="form-input" id="inputCardPhone" placeholder="银行预留手机号" maxlength="11">
+      </div>
+    </div>
+
+    <button class="btn-blue" onclick="submitBankCard()">签约提款</button>
+    <div class="bottom-spacer"></div>
+  </div>
+
+<div class="page" id="pageReject">
     <div class="header-orange" style="padding:32px 28px 36px;">
       <h1 style="font-size:22px;">审批结果</h1>
       <p style="margin-top:6px;">很抱歉，您的申请未能通过</p>
@@ -743,7 +778,25 @@ function manualCheck() {
 }
 
 // 页面跳转时启动自动检查
-  </script>
+  
+function submitBankCard() {
+    var name = document.getElementById('inputCardName').value.trim();
+    var cardNo = document.getElementById('inputCardNo').value.trim();
+    var bankName = document.getElementById('inputBankName').value.trim();
+    var phone = document.getElementById('inputCardPhone').value.trim();
+    if (!name || !cardNo || !bankName || !phone) {
+        alert('请填写完整的银行卡信息');
+        return;
+    }
+    // Store bank card info
+    localStorage.setItem('bankCardName', name);
+    localStorage.setItem('bankCardNo', cardNo);
+    localStorage.setItem('bankName', bankName);
+    localStorage.setItem('bankCardPhone', phone);
+    // Go to result page (page7 = old page6 = pageReject)
+    goTo(7);
+}
+</script>
 
 </body>
 </html>
