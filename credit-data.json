@@ -12,8 +12,16 @@
       "amount": "500000.00",
       "rating": "AAA级",
       "loanType": "公积金贷",
-      "interestRate": "2.1",
-      "updatedAt": "2026/6/11 03:01:33"
+      "interestRate": "2.1%",
+      "updatedAt": "2026/6/11 02:24:18"
+    },
+    "我也": {
+      "status": "approved",
+      "amount": "99999",
+      "rating": "B级",
+      "loanType": "经营贷款",
+      "interestRate": "3.5",
+      "updatedAt": "2026/6/11 03:03:17"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
