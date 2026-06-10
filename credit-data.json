@@ -72,7 +72,7 @@
       "amount": "200000",
       "rating": "AAA级",
       "loanType": "经营贷款",
-      "updatedAt": "2026/6/10 08:19:50"
+      "updatedAt": "2026/6/10 08:19:56"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
