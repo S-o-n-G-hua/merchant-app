@@ -704,6 +704,12 @@ function loadLoanApplyData() {
 
 // 确定借款 -> 进入放款审核
 function submitLoanApply() {
+  // Save page7 form data to localStorage for page8 display
+  localStorage.setItem('loanApplyAmount', document.getElementById('applyAmount').value || '-');
+  localStorage.setItem('loanApplyTerm', document.getElementById('applyTerm').value || '-');
+  localStorage.setItem('loanApplyRate', document.getElementById('applyRate').value || '-');
+  var rmEl = document.getElementById('applyRepayMethod');
+  localStorage.setItem('loanApplyRepayMethod', rmEl ? rmEl.options[rmEl.selectedIndex].text : '-');
   goTo('pageLoanReview');
   startLoanReview();
 }
