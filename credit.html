@@ -156,13 +156,10 @@ body {
 .result-amount-label { font-size: 13px; color: #888; margin-bottom: 4px; }
 .result-amount-value { font-size: 36px; font-weight: 800; color: #2d7ac7; }
 .result-amount-unit { font-size: 16px; color: #5b8fd4; font-weight: 600; }
-.result-detail-row {
-  display: flex; justify-content: space-between; padding: 10px 0;
-  border-bottom: 1px solid #eee; font-size: 14px;
-}
+.result-detail-row{display:flex;align-items:center;justify-content:space-between;padding:10px 8px;border-bottom:1px solid #f5f5f5;}
 .result-detail-row:last-child { border-bottom: none; }
 .detail-key{color:#666;font-size:14px;flex-shrink:0;}
-.detail-val{color:#333;font-size:14px;font-weight:500;text-align:right;}
+.detail-val{color:#333;font-size:14px;font-weight:500;text-align:right;word-break:break-all;}
 .val-approved { color: #43b97f; }
 
 /* 拒绝页 */
@@ -421,7 +418,7 @@ body {
       </div>
 
 
-      <div style="text-align:left;padding:8px 8px 0 8px;margin-bottom:0;border-bottom:1px solid #eee;">
+      <div style="text-align:left;padding:0 8px;">
         <div class="info-row"><span class="info-label">姓名：</span><span class="info-value" id="rName">-</span></div>
         <div class="info-row"><span class="info-label">身份证号：</span><span class="info-value" id="rIdCard">-</span></div>
         <div class="info-row"><span class="info-label">电话号码：</span><span class="info-value" id="rPhone">-</span></div>
@@ -431,7 +428,7 @@ body {
         
       </div>
 
-      <div style="text-align:left;padding:0 8px;margin-top:-12px;">
+      <div style="text-align:left;padding:0 8px;">
         <div class="result-detail-row">
           <span class="detail-key">年化利率</span>
           <span class="detail-val">3.85% 起</span>
