@@ -505,26 +505,42 @@ position:relative; overflow:hidden;}
 <div class="page" id="pageLoanApply">
     <div class="card" style="margin:16px;border-radius:14px;">
       <div style="text-align:center;padding:28px 0 20px;">
-        <div style="font-size:48px;margin-bottom:12px;">&#128176;</div>
         <div style="font-size:18px;font-weight:700;color:#333;">借款申请</div>
       </div>
 
-      <div style="padding:0 16px;">
-        <div class="info-row">
-          <span class="info-label">借款金额</span>
-          <span class="info-value" id="applyAmount">--</span>
+      <div style="padding:4px 16px 0;">
+        <div class="form-group">
+          <label>借款金额</label>
+          <input type="number" class="form-input" id="applyAmount" placeholder="请输入借款金额">
         </div>
-        <div class="info-row">
-          <span class="info-label">期限</span>
-          <span class="info-value" id="applyTerm">--</span>
+        <div class="form-group">
+          <label>期限</label>
+          <select class="form-input" id="applyTerm" style="appearance:none;">
+            <option value="">请选择期限</option>
+            <option value="1">1期</option>
+            <option value="3">3期</option>
+            <option value="6">6期</option>
+            <option value="9">9期</option>
+            <option value="12">12期</option>
+            <option value="24">24期</option>
+            <option value="36">36期</option>
+          </select>
         </div>
-        <div class="info-row">
-          <span class="info-label">年化利率</span>
-          <span class="info-value" id="applyRate">--</span>
+        <div class="form-group">
+          <label>年化利率</label>
+          <input type="text" class="form-input" id="applyRate" readonly style="background:#f5f5f5;color:#333;">
         </div>
-        <div class="info-row">
-          <span class="info-label">还款方式</span>
-          <span class="info-value" id="applyRepay">--</span>
+        <div class="form-group">
+          <label>还款方式</label>
+          <select class="form-input" id="applyRepay" style="appearance:none;">
+            <option value="">请选择还款方式</option>
+            <option value="等额本息">等额本息</option>
+            <option value="先息后本">先息后本</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>收款账户</label>
+          <input type="text" class="form-input" id="applyBankAccount" readonly style="background:#f5f5f5;color:#333;">
         </div>
       </div>
     </div>
@@ -617,35 +633,43 @@ function startLoanReview() {
 
 // 借款申请页面 - 加载数据
 function loadLoanApplyData() {
-  // Read from credit-data (stored in localStorage during checkResult)
   var creditName = localStorage.getItem('creditName') || '';
   
-  // Try to get loan info from stored data
-  var amount = localStorage.getItem('loanAmount') || '--';
-  var term = localStorage.getItem('loanTerm') || '--';
-  var rate = localStorage.getItem('loanRate') || '--';
-  var repay = localStorage.getItem('loanRepay') || '--';
-
-  // Fallback: read from page5 result data if available
+  // Read from page5 result data
+  var maxAmount = '';
+  var rate = '';
   try {
     var savedResult = localStorage.getItem('creditResult_' + creditName);
     if (savedResult) {
       var rd = JSON.parse(savedResult);
-      if (rd.amount) amount = rd.amount;
-      if (rd.term) term = rd.term;
+      if (rd.amount) maxAmount = rd.amount;
       if (rd.rate) rate = rd.rate;
-      if (rd.repayMethod) repay = rd.repayMethod;
     }
   } catch(e) {}
 
+  // Set amount input with placeholder hinting at max
   var elAmt = document.getElementById('applyAmount');
-  var elTerm = document.getElementById('applyTerm');
+  if (elAmt) {
+    elAmt.placeholder = maxAmount ? '最高可借 ' + maxAmount : '请输入借款金额';
+    elAmt.max = maxAmount ? parseInt(maxAmount.replace(/[^0-9]/g, '')) : 999999;
+  }
+  
+  // Set rate (readonly display from page5)
   var elRate = document.getElementById('applyRate');
-  var elRepay = document.getElementById('applyRepay');
-  if (elAmt) elAmt.textContent = amount;
-  if (elTerm) elTerm.textContent = term;
-  if (elRate) elRate.textContent = rate;
-  if (elRepay) elRepay.textContent = repay;
+  if (elRate && rate) elRate.value = rate;
+
+  // Set bank account from page6 bound card
+  var cardName = localStorage.getItem('bankCardName') || '';
+  var cardNo = localStorage.getItem('bankCardNo') || '';
+  var bankName = localStorage.getItem('bankName') || '';
+  var elBank = document.getElementById('applyBankAccount');
+  if (elBank) {
+    var acctText = '';
+    if (bankName) acctText += bankName + ' ';
+    if (cardName) acctText += cardName + ' ';
+    if (cardNo) acctText += cardNo;
+    elBank.value = acctText.trim();
+  }
 }
 
 // 确定借款 -> 进入放款审核
