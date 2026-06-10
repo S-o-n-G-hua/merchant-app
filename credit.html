@@ -529,7 +529,7 @@ function handleFileSelect(event, type) {
     const text = document.getElementById(textId);
     img.src = e.target.result;
     img.style.display = 'block';
-    text.innerHTML = '✅ 已上传';
+    text.style.display = 'none';
     text.style.color = '#43b97f';
   };
   reader.readAsDataURL(file);
