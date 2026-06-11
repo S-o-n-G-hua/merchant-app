@@ -21,7 +21,7 @@
       "rating": "AAA级",
       "loanType": "经营贷款",
       "interestRate": "2.1",
-      "updatedAt": "2026/6/11 11:31:12"
+      "updatedAt": "2026/6/11 11:32:30"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
