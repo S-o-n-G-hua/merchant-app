@@ -14,6 +14,14 @@
       "loanType": "信用贷",
       "interestRate": "1.5",
       "updatedAt": "2026/6/11 03:08:32"
+    },
+    "潘祖文": {
+      "status": "approved",
+      "amount": "500000",
+      "rating": "AAA级",
+      "loanType": "经营贷款",
+      "interestRate": "2.1",
+      "updatedAt": "2026/6/11 11:31:12"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
