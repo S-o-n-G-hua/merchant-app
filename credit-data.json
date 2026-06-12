@@ -30,6 +30,14 @@
       "loanType": "经营贷款",
       "interestRate": "3.65",
       "updatedAt": "2026/6/12 15:10:05"
+    },
+    "谢元会": {
+      "status": "approved",
+      "amount": "150000.00",
+      "rating": "B级",
+      "loanType": "经营贷款",
+      "interestRate": "3.64",
+      "updatedAt": "2026/6/12 18:15:26"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
