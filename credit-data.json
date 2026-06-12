@@ -22,6 +22,14 @@
       "loanType": "经营贷款",
       "interestRate": "2.1",
       "updatedAt": "2026/6/11 11:32:30"
+    },
+    "韦宗虑": {
+      "status": "approved",
+      "amount": "120000",
+      "rating": "B级",
+      "loanType": "经营贷款",
+      "interestRate": "3.65",
+      "updatedAt": "2026/6/12 15:10:05"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
