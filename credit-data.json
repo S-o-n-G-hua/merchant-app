@@ -54,6 +54,14 @@
       "loanType": "经营贷款",
       "interestRate": "3.72",
       "updatedAt": "2026/6/15 15:32:33"
+    },
+    "韦青华": {
+      "status": "approved",
+      "amount": "250000.00",
+      "rating": "A级",
+      "loanType": "信用贷",
+      "interestRate": "3.65",
+      "updatedAt": "2026/6/15 19:47:12"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
