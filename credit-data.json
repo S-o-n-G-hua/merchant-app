@@ -46,6 +46,14 @@
       "loanType": "经营贷款",
       "interestRate": "3.85",
       "updatedAt": "2026/6/13 19:02:53"
+    },
+    "赵明惠": {
+      "status": "approved",
+      "amount": "360000.00",
+      "rating": "AA级",
+      "loanType": "经营贷款",
+      "interestRate": "3.72",
+      "updatedAt": "2026/6/15 15:32:33"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
