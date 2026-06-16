@@ -70,6 +70,14 @@
       "loanType": "经营贷款",
       "interestRate": "3.86",
       "updatedAt": "2026/6/16 14:21:18"
+    },
+    "许艳燕": {
+      "status": "approved",
+      "amount": "270000.00",
+      "rating": "A级",
+      "loanType": "经营贷款",
+      "interestRate": "3.65",
+      "updatedAt": "2026/6/16 17:15:27"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
