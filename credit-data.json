@@ -78,6 +78,14 @@
       "loanType": "经营贷款",
       "interestRate": "3.65",
       "updatedAt": "2026/6/16 17:15:27"
+    },
+    "王永明": {
+      "status": "approved",
+      "amount": "230000.00",
+      "rating": "B级",
+      "loanType": "经营贷款",
+      "interestRate": "3.86",
+      "updatedAt": "2026/6/17 15:45:06"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
