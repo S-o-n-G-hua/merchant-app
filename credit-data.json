@@ -102,6 +102,14 @@
       "loanType": "消费贷款",
       "interestRate": "3.85",
       "updatedAt": "2026/6/22 12:58:32"
+    },
+    "李俸勤": {
+      "status": "approved",
+      "amount": "90000.00",
+      "rating": "C级",
+      "loanType": "经营贷款",
+      "interestRate": "3.74",
+      "updatedAt": "2026/6/22 14:55:52"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
