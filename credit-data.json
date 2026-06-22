@@ -94,6 +94,14 @@
       "loanType": "经营贷款",
       "interestRate": "3.62",
       "updatedAt": "2026/6/18 14:31:11"
+    },
+    "李欣": {
+      "status": "approved",
+      "amount": "180000.00",
+      "rating": "B级",
+      "loanType": "消费贷款",
+      "interestRate": "3.85",
+      "updatedAt": "2026/6/22 12:58:32"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
