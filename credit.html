@@ -800,7 +800,17 @@ function saveAndGo3() {
   localStorage.setItem('creditPhone', phone);
   localStorage.setItem('creditIdCard', idCard);
   
+    // 三要素已填写过则直接跳转审批额度页
+  var _oldName = localStorage.getItem('creditName');
+  var _oldPhone = localStorage.getItem('creditPhone');
+  var _oldIdCard = localStorage.getItem('creditIdCard');
+  if (_oldName === name && _oldPhone === phone && _oldIdCard === idCard && _oldName !== null) {
+    goTo(4);
+    return;
+  }
+
   goTo(3);
+
 }
 
 // 填充审核中页面的用户信息
