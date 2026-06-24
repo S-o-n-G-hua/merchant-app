@@ -853,14 +853,6 @@ function checkResult() {
   var waitHint = document.getElementById('waitHint');
   if (waitHint) waitHint.textContent = '正在查询...';
 
-  // If same user already applied before, jump to page4 directly
-  var _sn = localStorage.getItem('creditName');
-  var _sp = localStorage.getItem('creditPhone');
-  var _si = localStorage.getItem('creditIdCard');
-  if (_sn && _sp && _si && _sn !== null) {
-    goTo(4);
-    return;
-  }
 
   goTo(3);
 
