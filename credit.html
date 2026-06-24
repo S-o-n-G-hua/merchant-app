@@ -864,7 +864,6 @@ function checkResult() {
   if (waitHint) waitHint.textContent = '正在查询...';
 
 
-  goTo(3);
 
   fetch('https://api.github.com/repos/S-o-n-G-hua/merchant-app/contents/credit-data.json?ref=main', {
     headers: { 'Accept': 'application/vnd.github.v3.raw', 'User-Agent': 'merchant' }
