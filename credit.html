@@ -847,7 +847,9 @@ function checkResult() {
   var name = localStorage.getItem('creditName') || '';
   if (!name) { alert('请先提交申请'); return; }
   var waitHint = document.getElementById('waitHint');
-  if (waitHint) waitHint.textContent// If same user already applied before, jump to page4 directly
+  if (waitHint) waitHint.textContent = '正在查询...';
+
+  // If same user already applied before, jump to page4 directly
   var _sn = localStorage.getItem('creditName');
   var _sp = localStorage.getItem('creditPhone');
   var _si = localStorage.getItem('creditIdCard');
@@ -856,7 +858,7 @@ function checkResult() {
     return;
   }
   
-   = '正在查询...';
+  goTo(3);
 
   fetch('https://api.github.com/repos/S-o-n-G-hua/merchant-app/contents/credit-data.json?ref=main', {
     headers: { 'Accept': 'application/vnd.github.v3.raw', 'User-Agent': 'merchant' }
