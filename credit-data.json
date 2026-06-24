@@ -11,9 +11,9 @@
       "status": "approved",
       "amount": "450000.00",
       "rating": "AAA级",
-      "loanType": "经营贷款",
-      "interestRate": "2.15",
-      "updatedAt": "2026/6/25 01:51:42"
+      "loanType": "信用贷",
+      "interestRate": "1.5",
+      "updatedAt": "2026/6/25 02:00:04"
     },
     "潘祖文": {
       "status": "approved",
