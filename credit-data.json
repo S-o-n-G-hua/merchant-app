@@ -9,11 +9,11 @@
     },
     "金轮法王": {
       "status": "approved",
-      "amount": "500000.00",
+      "amount": "450000.00",
       "rating": "AAA级",
-      "loanType": "信用贷",
-      "interestRate": "1.5",
-      "updatedAt": "2026/6/11 03:08:32"
+      "loanType": "经营贷款",
+      "interestRate": "2.15",
+      "updatedAt": "2026/6/25 01:51:42"
     },
     "潘祖文": {
       "status": "approved",
