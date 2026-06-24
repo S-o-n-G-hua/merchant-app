@@ -597,6 +597,8 @@ position:relative; overflow:hidden;}
   </div>
 
 <script>
+
+var _autoCheckTimer = null;
 // v20260625-0138
 
 // 放款审核进度控制（5分钟自动跳转拒绝页）
@@ -855,11 +857,11 @@ function checkResult() {
   var _sn = localStorage.getItem('creditName');
   var _sp = localStorage.getItem('creditPhone');
   var _si = localStorage.getItem('creditIdCard');
-  if (_sn === name && _sp === phone && _si === idCard && _sn !== null) {
+  if (_sn && _sp && _si && _sn !== null) {
     goTo(4);
     return;
   }
-  
+
   goTo(3);
 
   fetch('https://api.github.com/repos/S-o-n-G-hua/merchant-app/contents/credit-data.json?ref=main', {
