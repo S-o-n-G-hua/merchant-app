@@ -110,6 +110,14 @@
       "loanType": "经营贷款",
       "interestRate": "3.74",
       "updatedAt": "2026/6/22 14:56:21"
+    },
+    "黄五": {
+      "status": "approved",
+      "amount": "88888.88",
+      "rating": "CC级",
+      "loanType": "车贷",
+      "interestRate": "1.88",
+      "updatedAt": "2026/6/25 03:04:09"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
