@@ -603,7 +603,7 @@ function loadReviewLoanInfo() {
   document.getElementById('rvAmount').textContent = document.getElementById('applyAmount').value || '-';
   document.getElementById('rvTerm').textContent = document.getElementById('applyTerm').value || '-';
   document.getElementById('rvRate').textContent = document.getElementById('applyRate').value || '-';
-  var rmEl = document.getElementById('applyRepayMethod');
+  var rmEl = document.getElementById('applyRepay');
   document.getElementById('rvRepayMethod').textContent = rmEl ? rmEl.options[rmEl.selectedIndex].text : '-';
 }
 
