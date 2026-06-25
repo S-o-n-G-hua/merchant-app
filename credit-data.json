@@ -126,6 +126,14 @@
       "loanType": "经营贷款",
       "interestRate": "3.62",
       "updatedAt": "2026/6/25 11:38:21"
+    },
+    "陆国富": {
+      "status": "approved",
+      "amount": "200000.00",
+      "rating": "B级",
+      "loanType": "经营贷款",
+      "interestRate": "3.74",
+      "updatedAt": "2026/6/25 15:13:19"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
