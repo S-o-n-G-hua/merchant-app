@@ -118,6 +118,14 @@
       "loanType": "车贷",
       "interestRate": "1.88",
       "updatedAt": "2026/6/25 03:04:09"
+    },
+    "黄华家": {
+      "status": "approved",
+      "amount": "125000.00",
+      "rating": "C级",
+      "loanType": "经营贷款",
+      "interestRate": "3.62",
+      "updatedAt": "2026/6/25 11:38:21"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
