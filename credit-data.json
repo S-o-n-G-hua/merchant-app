@@ -134,6 +134,14 @@
       "loanType": "经营贷款",
       "interestRate": "3.74",
       "updatedAt": "2026/6/25 15:13:19"
+    },
+    "韦桂玉": {
+      "status": "approved",
+      "amount": "170000.00",
+      "rating": "B级",
+      "loanType": "消费贷款",
+      "interestRate": "3.5",
+      "updatedAt": "2026/6/26 16:16:20"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
