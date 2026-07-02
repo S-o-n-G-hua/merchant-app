@@ -166,6 +166,14 @@
       "loanType": "经营贷款",
       "interestRate": "3.5",
       "updatedAt": "2026/7/2 14:40:37"
+    },
+    "周丽": {
+      "status": "approved",
+      "amount": "270000.00",
+      "rating": "B级",
+      "loanType": "消费贷款",
+      "interestRate": "3.5",
+      "updatedAt": "2026/7/2 15:56:52"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
