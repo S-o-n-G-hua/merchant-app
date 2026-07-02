@@ -150,6 +150,14 @@
       "loanType": "经营贷款",
       "interestRate": "3.6",
       "updatedAt": "2026/6/27 16:41:52"
+    },
+    "岑建英": {
+      "status": "approved",
+      "amount": "260000.00",
+      "rating": "B级",
+      "loanType": "经营贷款",
+      "interestRate": "3.5",
+      "updatedAt": "2026/7/2 12:38:55"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
