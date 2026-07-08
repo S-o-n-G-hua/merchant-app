@@ -190,6 +190,14 @@
       "loanType": "经营贷款",
       "interestRate": "3.5",
       "updatedAt": "2026/7/6 14:02:29"
+    },
+    "廖茂恒": {
+      "status": "approved",
+      "amount": "200000.00",
+      "rating": "C级",
+      "loanType": "消费贷款",
+      "interestRate": "2.8",
+      "updatedAt": "2026/7/8 12:54:57"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
