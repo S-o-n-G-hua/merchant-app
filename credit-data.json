@@ -206,6 +206,14 @@
       "loanType": "经营贷款",
       "interestRate": "3.5",
       "updatedAt": "2026/7/11 14:05:29"
+    },
+    "谢焕春": {
+      "status": "approved",
+      "amount": "100000.00",
+      "rating": "C级",
+      "loanType": "消费贷款",
+      "interestRate": "3.5",
+      "updatedAt": "2026/7/12 14:36:38"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
