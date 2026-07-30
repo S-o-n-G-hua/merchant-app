@@ -214,6 +214,14 @@
       "loanType": "消费贷款",
       "interestRate": "3.5",
       "updatedAt": "2026/7/12 14:36:38"
+    },
+    "郑其文": {
+      "status": "approved",
+      "amount": "200000.00",
+      "rating": "B级",
+      "loanType": "经营贷款",
+      "interestRate": "4.5",
+      "updatedAt": "2026/7/30 10:53:13"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
