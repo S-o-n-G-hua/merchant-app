@@ -257,11 +257,11 @@
     },
     "郝勇": {
       "status": "approved",
-      "amount": "118000.00",
+      "amount": "115000.00",
       "rating": "C级",
       "loanType": "信用贷",
       "interestRate": "3.85",
-      "updatedAt": "2026/10/17 12:06:02"
+      "updatedAt": "2026/10/17 12:11:37"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
