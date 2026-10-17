@@ -254,6 +254,14 @@
       "loanType": "经营贷款",
       "interestRate": "3.5",
       "updatedAt": "2026/8/20 14:59:02"
+    },
+    "郝勇": {
+      "status": "approved",
+      "amount": "118000.00",
+      "rating": "C级",
+      "loanType": "信用贷",
+      "interestRate": "3.85",
+      "updatedAt": "2026/10/17 12:06:02"
     }
   },
   "note": "用户额度数据，key为用户名。由credit-admin.html后台维护。"
